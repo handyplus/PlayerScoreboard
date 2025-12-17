@@ -1,0 +1,21 @@
+name: template
+main: cn.handyplus.template.Template
+version: 1.0.0
+author: handy
+website: https://ricedoc.handyplus.cn/wiki/Template/log/
+api-version: 1.13
+description: 模版插件
+softdepend: [ PlaceholderAPI ]
+folia-supported: true
+commands:
+  template:
+    description: 模版插件
+    aliases: [ temp ]
+permissions:
+  template.*:
+    description: 模版插件
+    children:
+      template.reload: true
+  template.reload:
+    description: 重载插件
+    default: op

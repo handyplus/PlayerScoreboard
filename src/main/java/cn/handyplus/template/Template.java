@@ -1,0 +1,49 @@
+package cn.handyplus.template;
+
+import cn.handyplus.lib.InitApi;
+import cn.handyplus.lib.constants.HookPluginEnum;
+import cn.handyplus.lib.util.HookPluginUtil;
+import cn.handyplus.lib.util.MessageUtil;
+import cn.handyplus.template.util.ConfigUtil;
+import org.bukkit.ChatColor;
+import org.bukkit.plugin.java.JavaPlugin;
+
+/**
+ * 主类
+ *
+ * @author handy
+ */
+public class Template extends JavaPlugin {
+    public static Template INSTANCE;
+    public static boolean USE_PAPI;
+
+    @Override
+    public void onEnable() {
+        INSTANCE = this;
+        InitApi initApi = InitApi.getInstance(this);
+        // 加载 配置文件
+        ConfigUtil.init();
+        // 加载 PlaceholderApi
+        USE_PAPI = HookPluginUtil.hook(HookPluginEnum.PLACEHOLDER_API);
+
+        // 初始化
+        initApi.addMetrics(0)
+                .checkVersion()
+                .initCommand("cn.handyplus.template.command")
+                .initClickEvent("cn.handyplus.template.listener.gui")
+                .initListener("cn.handyplus.template.listener")
+                .enableSql("cn.handyplus.template.entity");
+
+        MessageUtil.sendConsoleMessage(ChatColor.GREEN + "已成功载入服务器！");
+        MessageUtil.sendConsoleMessage(ChatColor.GREEN + "Author:handy 使用文档: https://ricedoc.handyplus.cn/wiki/Template/README/");
+    }
+
+    /**
+     * 关闭处理
+     */
+    @Override
+    public void onDisable() {
+        InitApi.disable();
+    }
+
+}
