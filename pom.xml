@@ -14,6 +14,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <HandyLib.version>3.31.5</HandyLib.version>
         <spigot-api.vesion>1.21.11-R0.1-SNAPSHOT</spigot-api.vesion>
+        <placeholderapi.version>2.11.7</placeholderapi.version>
         <lombok.version>1.18.38</lombok.version>
         <annotations.version>26.0.2</annotations.version>
     </properties>
@@ -42,6 +43,12 @@
             <artifactId>annotations</artifactId>
             <version>${annotations.version}</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>me.clip</groupId>
+            <artifactId>placeholderapi</artifactId>
+            <version>${placeholderapi.version}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

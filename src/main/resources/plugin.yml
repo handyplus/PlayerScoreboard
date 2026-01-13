@@ -12,9 +12,16 @@ commands:
     aliases: [ psd ]
 permissions:
   playerScoreboard.*:
-    description: 玩家计分板
+    description: 玩家计分板所有权限
     children:
       playerScoreboard.reload: true
+      playerScoreboard.toggle: true
   playerScoreboard.reload:
     description: 重载插件
     default: op
+  playerScoreboard.toggle:
+    description: 切换计分板显示
+    default: true
+  playerScoreboard.default:
+    description: 默认计分板权限
+    default: true

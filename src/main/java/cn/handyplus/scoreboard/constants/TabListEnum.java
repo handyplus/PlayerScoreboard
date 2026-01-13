@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * tab提醒
+ * tab 提醒
  *
  * @author handy
  */
@@ -19,7 +19,7 @@ public enum TabListEnum {
     /**
      * 第一层提醒
      */
-    FIRST(Arrays.asList("reload"), 0, null, 1),
+    FIRST(Arrays.asList("reload", "toggle"), 0, null, 1),
 
     ;
 

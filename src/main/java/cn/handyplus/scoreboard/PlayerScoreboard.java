@@ -4,6 +4,7 @@ import cn.handyplus.lib.InitApi;
 import cn.handyplus.lib.constants.HookPluginEnum;
 import cn.handyplus.lib.util.HookPluginUtil;
 import cn.handyplus.lib.util.MessageUtil;
+import cn.handyplus.scoreboard.job.ScoreboardRefreshJob;
 import cn.handyplus.scoreboard.util.ConfigUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -33,6 +34,9 @@ public class PlayerScoreboard extends JavaPlugin {
                 .initClickEvent("cn.handyplus.scoreboard.listener.gui")
                 .initListener("cn.handyplus.scoreboard.listener")
                 .enableSql("cn.handyplus.scoreboard.entity");
+
+        // 启动计分板定时任务
+        ScoreboardRefreshJob.start();
 
         MessageUtil.sendConsoleMessage(ChatColor.GREEN + "已成功载入服务器！");
         MessageUtil.sendConsoleMessage(ChatColor.GREEN + "Author:handy 使用文档: https://ricedoc.handyplus.cn/wiki/PlayerScoreboard/README/");

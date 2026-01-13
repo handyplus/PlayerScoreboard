@@ -3,3 +3,25 @@ noPermission: "&c你没有权限执行此命令..."
 
 # 重载插件提醒
 reloadMsg: "&a插件重载完毕..."
+
+# 计分板相关提醒
+scoreboardEnabled: "&a计分板已启用"
+scoreboardDisabled: "&c计分板已禁用"
+scoreboardToggle: "&e计分板状态已切换"
+
+noPlayerFailureMsg: "&8[&c✘&8] &7该命令只能玩家执行"
+
+# API 相关提醒
+apiScoreboardRegistered: "&a外部计分板已注册: %name%"
+apiScoreboardUnregistered: "&e外部计分板已注销: %name%"
+
+# /psd help指令管理员出现的提醒
+helps:
+  - ""
+  - " &3Player&bScoreboard &8&l▪ &7米饭出品～"
+  - ""
+  - " &7命令: &f/psd &8[...]"
+  - " &7参数:"
+  - "   &8&l- &f reload   &7重载配置文件"
+  - "   &8&l- &f toggle   &7切换计分板显示状态"
+

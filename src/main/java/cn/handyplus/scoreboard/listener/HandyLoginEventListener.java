@@ -3,6 +3,7 @@ package cn.handyplus.scoreboard.listener;
 import cn.handyplus.lib.annotation.HandyListener;
 import cn.handyplus.lib.internal.HandyLoginEvent;
 import cn.handyplus.lib.util.HandyHttpUtil;
+import cn.handyplus.scoreboard.core.PlayerScoreboardManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -22,7 +23,10 @@ public class HandyLoginEventListener implements Listener {
      */
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onOpPlayerJoin(HandyLoginEvent event) {
+        // 检查版本更新
         HandyHttpUtil.checkVersion(event.getPlayer());
+        // 为玩家创建计分板
+        PlayerScoreboardManager.createScoreboard(event.getPlayer());
     }
 
 }

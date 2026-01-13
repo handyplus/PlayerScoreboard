@@ -1,0 +1,55 @@
+# 计分板配置文件
+# 支持多配置,按优先级从高到低排序
+# 权限格式: PlayerScoreboard.{key} 例如: PlayerScoreboard.vip
+
+# 计分板配置列表
+scoreboards:
+  # OP 配置 (最高优先级)
+  op:
+    # 优先级,数字越大优先级越高
+    priority: 100
+    # 权限节点 PlayerScoreboard.op
+    # 计分板标题
+    title: "&6&l服务器计分板 &c[OP]"
+    # 计分板内容,从上到下显示
+    lines:
+      - "&7━━━━━━━━━━━━━━━━"
+      - "&e玩家: &f%player_name%"
+      - "&e等级: &f%player_level%"
+      - "&e金币: &f%vault_eco_balance%"
+      - "&7"
+      - "&c在线人数: &f%server_online%/%server_max_players%"
+      - "&cTPS: &f%server_tps_1%"
+      - "&c内存: &f%server_ram_used%/%server_ram_max% MB"
+      - "&7"
+      - "&e当前时间: &f%server_time_HH:mm:ss%"
+      - "&7━━━━━━━━━━━━━━━━"
+
+  # VIP 配置
+  vip:
+    priority: 50
+    title: "&b&l服务器计分板 &e[VIP]"
+    lines:
+      - "&7━━━━━━━━━━━━━━━━"
+      - "&e玩家: &f%player_name%"
+      - "&e等级: &f%player_level%"
+      - "&e金币: &f%vault_eco_balance%"
+      - "&7"
+      - "&a在线人数: &f%server_online%/%server_max_players%"
+      - "&7"
+      - "&e当前时间: &f%server_time_HH:mm:ss%"
+      - "&7━━━━━━━━━━━━━━━━"
+
+  # 默认配置 (最低优先级,所有玩家都有权限)
+  default:
+    priority: 0
+    title: "&a&l服务器计分板"
+    lines:
+      - "&7━━━━━━━━━━━━━━━━"
+      - "&e玩家: &f%player_name%"
+      - "&e等级: &f%player_level%"
+      - "&7"
+      - "&a在线人数: &f%server_online%"
+      - "&7"
+      - "&e当前时间: &f%server_time_HH:mm:ss%"
+      - "&7━━━━━━━━━━━━━━━━"
