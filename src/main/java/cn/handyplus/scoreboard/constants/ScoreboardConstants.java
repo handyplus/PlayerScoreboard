@@ -24,4 +24,9 @@ public final class ScoreboardConstants {
      */
     public static List<ScoreboardConfig> SCOREBOARD_CONFIGS = new ArrayList<>();
 
+    /**
+     * 所有世界标识
+     */
+    public static final String ALL = "[ALL]";
+
 }

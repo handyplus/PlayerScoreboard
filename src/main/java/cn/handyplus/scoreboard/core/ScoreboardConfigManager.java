@@ -1,5 +1,6 @@
 package cn.handyplus.scoreboard.core;
 
+import cn.handyplus.lib.core.CollUtil;
 import cn.handyplus.lib.util.HandyConfigUtil;
 import cn.handyplus.scoreboard.constants.ScoreboardConstants;
 import cn.handyplus.scoreboard.param.ScoreboardConfig;
@@ -31,7 +32,8 @@ public class ScoreboardConfigManager {
             int priority = ConfigUtil.SCOREBOARD_CONFIG.getInt("scoreboards." + scoreboardKey + ".priority", 0);
             String title = ConfigUtil.SCOREBOARD_CONFIG.getString("scoreboards." + scoreboardKey + ".title", "&a计分板");
             List<String> lines = ConfigUtil.SCOREBOARD_CONFIG.getStringList("scoreboards." + scoreboardKey + ".lines");
-            ScoreboardConfig config = ScoreboardConfig.of(scoreboardKey, priority, title, lines);
+            List<String> worlds = ConfigUtil.SCOREBOARD_CONFIG.getStringList("scoreboards." + scoreboardKey + ".worlds");
+            ScoreboardConfig config = ScoreboardConfig.of(scoreboardKey, priority, title, lines, worlds);
             ScoreboardConstants.SCOREBOARD_CONFIGS.add(config);
         }
         // 按优先级从高到低排序
@@ -46,6 +48,14 @@ public class ScoreboardConfigManager {
      */
     public static Optional<ScoreboardConfig> getPlayerScoreboardConfig(Player player) {
         for (ScoreboardConfig config : ScoreboardConstants.SCOREBOARD_CONFIGS) {
+            // 检查世界限制
+            List<String> worlds = config.getWorlds();
+            if (CollUtil.isNotEmpty(worlds)) {
+                // 如果配置了 [ALL] 则表示所有世界都允许
+                if (!CollUtil.contains(worlds, ScoreboardConstants.ALL) && !CollUtil.contains(worlds, player.getWorld().getName())) {
+                    continue;
+                }
+            }
             // default 配置所有玩家都有权限
             if (ScoreboardConstants.DEFAULT_KEY.equals(config.getKey())) {
                 return Optional.of(config);

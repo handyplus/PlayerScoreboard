@@ -74,7 +74,13 @@ public class PlayerScoreboardManager {
         }
         // 获取计分板配置
         Optional<ScoreboardConfig> configOpt = ScoreboardConfigManager.getPlayerScoreboardConfig(player);
-        configOpt.ifPresent(scoreboardConfig -> updateScoreboardContent(player, scoreboardConfig));
+        if (!configOpt.isPresent()) {
+            // 如果没有配置则移除计分板内容
+            hideScoreboard(player.getUniqueId());
+        } else {
+            // 更新计分板内容
+            updateScoreboardContent(player, configOpt.get());
+        }
     }
 
     /**
@@ -131,18 +137,28 @@ public class PlayerScoreboardManager {
         PLAYER_SCOREBOARD_ENABLED.put(playerUuid, enabled);
         if (!enabled) {
             // 隐藏计分板
-            Scoreboard scoreboard = PLAYER_SCOREBOARDS.get(playerUuid);
-            if (scoreboard != null) {
-                Objective objective = scoreboard.getObjective(OBJECTIVE_NAME);
-                if (objective != null) {
-                    objective.unregister();
-                }
-            }
+            hideScoreboard(playerUuid);
         } else {
             // 显示计分板
             updateScoreboard(player);
         }
         return enabled;
+    }
+
+    /**
+     * 隐藏玩家计分板
+     *
+     * @param playerUuid 玩家 UUID
+     */
+    private static void hideScoreboard(UUID playerUuid) {
+        Scoreboard scoreboard = PLAYER_SCOREBOARDS.get(playerUuid);
+        if (scoreboard == null) {
+            return;
+        }
+        Objective objective = scoreboard.getObjective(OBJECTIVE_NAME);
+        if (objective != null) {
+            objective.unregister();
+        }
     }
 
     /**

@@ -39,6 +39,11 @@ public class ScoreboardConfig {
     private List<String> lines;
 
     /**
+     * 适用世界
+     */
+    private List<String> worlds;
+
+    /**
      * 是否外部配置
      */
     private Boolean external;
@@ -50,9 +55,10 @@ public class ScoreboardConfig {
      * @param priority 优先级
      * @param title    计分板标题
      * @param lines    计分板内容行
+     * @param worlds   适用世界
      * @return 计分板配置对象
      */
-    public static ScoreboardConfig of(String key, int priority, String title, List<String> lines) {
+    public static ScoreboardConfig of(String key, int priority, String title, List<String> lines, List<String> worlds) {
         ScoreboardConfig scoreboardConfig = new ScoreboardConfig();
         scoreboardConfig.setKey(key);
         scoreboardConfig.setPriority(priority);
@@ -73,8 +79,8 @@ public class ScoreboardConfig {
      * @param external 是否外部配置
      * @return 计分板配置对象
      */
-    public static ScoreboardConfig of(String key, int priority, String title, List<String> lines, Boolean external) {
-        ScoreboardConfig scoreboardConfig = of(key, priority, title, lines);
+    public static ScoreboardConfig of(String key, int priority, String title, List<String> lines, List<String> worlds, Boolean external) {
+        ScoreboardConfig scoreboardConfig = of(key, priority, title, lines, worlds);
         scoreboardConfig.setExternal(external);
         return scoreboardConfig;
     }
@@ -90,8 +96,8 @@ public class ScoreboardConfig {
      * @param permission 权限节点
      * @return 计分板配置对象
      */
-    public static ScoreboardConfig of(String key, int priority, String title, List<String> lines, Boolean external, String permission) {
-        ScoreboardConfig scoreboardConfig = of(key, priority, title, lines, external);
+    public static ScoreboardConfig of(String key, int priority, String title, List<String> lines, List<String> worlds, Boolean external, String permission) {
+        ScoreboardConfig scoreboardConfig = of(key, priority, title, lines, worlds, external);
         scoreboardConfig.setPermission(permission);
         return scoreboardConfig;
     }

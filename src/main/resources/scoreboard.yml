@@ -8,7 +8,11 @@ scoreboards:
   op:
     # 优先级,数字越大优先级越高
     priority: 100
-    # 权限节点 PlayerScoreboard.op
+    # 可显示的世界 [ALL] 表示全部
+    worlds:
+      - "world"
+      - "world_nether"
+      - "world_the_end"
     # 计分板标题
     title: "&6&l服务器计分板 &c[OP]"
     # 计分板内容,从上到下显示
@@ -29,6 +33,11 @@ scoreboards:
   vip:
     priority: 50
     title: "&b&l服务器计分板 &e[VIP]"
+    # 可显示的世界 [ALL] 表示全部
+    worlds:
+      - "world"
+      - "world_nether"
+      - "world_the_end"
     lines:
       - "&7━━━━━━━━━━━━━━━━"
       - "&e玩家: &f%player_name%"
@@ -44,6 +53,11 @@ scoreboards:
   default:
     priority: 0
     title: "&a&l服务器计分板"
+    # 可显示的世界 [ALL] 表示全部
+    worlds:
+      - "world"
+      - "world_nether"
+      - "world_the_end"
     lines:
       - "&7━━━━━━━━━━━━━━━━"
       - "&e玩家: &f%player_name%"
