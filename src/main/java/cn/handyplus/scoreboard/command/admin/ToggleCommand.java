@@ -34,7 +34,7 @@ public class ToggleCommand implements IHandyCommandEvent {
     @Override
     public void onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         Player player = AssertUtil.notPlayer(sender, BaseUtil.getMsgNotColor("noPlayerFailureMsg"));
-        boolean enabled = PlayerScoreboardManager.toggleScoreboard(player.getUniqueId());
+        boolean enabled = PlayerScoreboardManager.toggleScoreboard(player);
         MessageUtil.sendMessage(player, BaseUtil.getMsgNotColor(enabled ? "scoreboardEnabled" : "scoreboardDisabled"));
     }
 

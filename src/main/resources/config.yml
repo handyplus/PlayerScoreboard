@@ -1,6 +1,9 @@
 # 计分板刷新间隔(单位:秒)
 scoreboardRefreshInterval: 10
 
+# 是否在计分板显示序号
+showSerialNo: true
+
 # 是否开启更新提醒,建议开启
 isCheckUpdate: true
 

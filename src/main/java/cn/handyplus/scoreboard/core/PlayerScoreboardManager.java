@@ -1,5 +1,6 @@
 package cn.handyplus.scoreboard.core;
 
+import cn.handyplus.lib.constants.BaseConstants;
 import cn.handyplus.lib.util.BaseUtil;
 import cn.handyplus.scoreboard.hook.PlaceholderApiUtil;
 import cn.handyplus.scoreboard.param.ScoreboardConfig;
@@ -96,9 +97,14 @@ public class PlayerScoreboardManager {
         Objective objective = scoreboard.registerNewObjective(OBJECTIVE_NAME, "dummy", BaseUtil.replaceChatColor(title));
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         // 设置内容行
+        boolean showSerialNo = BaseConstants.CONFIG.getBoolean("showSerialNo");
         int score = lines.size();
         for (String line : lines) {
-            objective.getScore(BaseUtil.replaceChatColor(line)).setScore(score);
+            if (showSerialNo) {
+                objective.getScore(BaseUtil.replaceChatColor(line)).setScore(score);
+            } else {
+                objective.getScore(BaseUtil.replaceChatColor(line));
+            }
             score--;
         }
     }
@@ -116,10 +122,11 @@ public class PlayerScoreboardManager {
     /**
      * 切换玩家计分板显示状态
      *
-     * @param playerUuid 玩家 uid
+     * @param player 玩家
      * @return 切换后的状态
      */
-    public static boolean toggleScoreboard(UUID playerUuid) {
+    public static boolean toggleScoreboard(Player player) {
+        UUID playerUuid = player.getUniqueId();
         boolean enabled = !PLAYER_SCOREBOARD_ENABLED.getOrDefault(playerUuid, true);
         PLAYER_SCOREBOARD_ENABLED.put(playerUuid, enabled);
         if (!enabled) {
@@ -131,6 +138,9 @@ public class PlayerScoreboardManager {
                     objective.unregister();
                 }
             }
+        } else {
+            // 显示计分板
+            updateScoreboard(player);
         }
         return enabled;
     }
