@@ -29,13 +29,13 @@ public class PlayerScoreboard extends JavaPlugin {
         // 初始化
         initApi.addMetrics(0)
                 .checkVersion()
-                .initCommand("cn.handyplus.template.command")
-                .initClickEvent("cn.handyplus.template.listener.gui")
-                .initListener("cn.handyplus.template.listener")
-                .enableSql("cn.handyplus.template.entity");
+                .initCommand("cn.handyplus.scoreboard.command")
+                .initClickEvent("cn.handyplus.scoreboard.listener.gui")
+                .initListener("cn.handyplus.scoreboard.listener")
+                .enableSql("cn.handyplus.scoreboard.entity");
 
         MessageUtil.sendConsoleMessage(ChatColor.GREEN + "已成功载入服务器！");
-        MessageUtil.sendConsoleMessage(ChatColor.GREEN + "Author:handy 使用文档: https://ricedoc.handyplus.cn/wiki/Template/README/");
+        MessageUtil.sendConsoleMessage(ChatColor.GREEN + "Author:handy 使用文档: https://ricedoc.handyplus.cn/wiki/PlayerScoreboard/README/");
     }
 
     /**
