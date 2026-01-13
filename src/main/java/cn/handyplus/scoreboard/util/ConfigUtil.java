@@ -1,4 +1,4 @@
-package cn.handyplus.template.util;
+package cn.handyplus.scoreboard.util;
 
 import cn.handyplus.lib.util.HandyConfigUtil;
 

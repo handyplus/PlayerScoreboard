@@ -1,21 +1,20 @@
-name: template
-main: cn.handyplus.template.Template
+name: PlayerScoreboard
+main: cn.handyplus.scoreboard.PlayerScoreboard
 version: 1.0.0
 author: handy
-website: https://ricedoc.handyplus.cn/wiki/Template/log/
+website: https://ricedoc.handyplus.cn/wiki/PlayerScoreboard/log/
 api-version: 1.13
-description: 模版插件
-softdepend: [ PlaceholderAPI ]
-folia-supported: true
+description: 玩家计分板
+softdepend: [ PlaceholderAPI,AuthMe,CatSeedLogin,OauthLogin ]
 commands:
-  template:
-    description: 模版插件
-    aliases: [ temp ]
+  playerScoreboard:
+    description: 玩家计分板
+    aliases: [ psd ]
 permissions:
-  template.*:
-    description: 模版插件
+  playerScoreboard.*:
+    description: 玩家计分板
     children:
-      template.reload: true
-  template.reload:
+      playerScoreboard.reload: true
+  playerScoreboard.reload:
     description: 重载插件
     default: op

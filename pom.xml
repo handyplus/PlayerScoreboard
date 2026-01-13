@@ -4,15 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>cn.handyplus.template</groupId>
-    <artifactId>template</artifactId>
+    <groupId>cn.handyplus.scoreboard</groupId>
+    <artifactId>PlayerScoreboard</artifactId>
     <version>1.0.0</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <HandyLib.version>3.30.6</HandyLib.version>
+        <HandyLib.version>3.31.5</HandyLib.version>
         <spigot-api.vesion>1.21.11-R0.1-SNAPSHOT</spigot-api.vesion>
         <lombok.version>1.18.38</lombok.version>
         <annotations.version>26.0.2</annotations.version>
@@ -76,7 +76,7 @@
                     <relocations>
                         <relocation>
                             <pattern>cn.handyplus.lib</pattern>
-                            <shadedPattern>cn.handyplus.template.lib</shadedPattern>
+                            <shadedPattern>cn.handyplus.scoreboard.lib</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>

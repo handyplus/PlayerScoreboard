@@ -1,11 +1,11 @@
-package cn.handyplus.template.command;
+package cn.handyplus.scoreboard.command;
 
 import cn.handyplus.lib.annotation.HandyCommand;
 import cn.handyplus.lib.command.HandyCommandWrapper;
 import cn.handyplus.lib.constants.BaseConstants;
 import cn.handyplus.lib.util.BaseUtil;
 import cn.handyplus.lib.util.MessageUtil;
-import cn.handyplus.template.constants.TabListEnum;
+import cn.handyplus.scoreboard.constants.TabListEnum;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -21,9 +21,9 @@ import java.util.List;
  *
  * @author handy
  */
-@HandyCommand(name = "template")
-public class TemplateCommand implements TabExecutor {
-    private final static String PERMISSION = "template.reload";
+@HandyCommand(name = "playerScoreboard")
+public class PlayerScoreboardCommand implements TabExecutor {
+    private final static String PERMISSION = "playerScoreboard.reload";
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {

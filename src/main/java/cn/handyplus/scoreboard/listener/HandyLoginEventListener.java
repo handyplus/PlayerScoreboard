@@ -1,4 +1,4 @@
-package cn.handyplus.template.listener;
+package cn.handyplus.scoreboard.listener;
 
 import cn.handyplus.lib.annotation.HandyListener;
 import cn.handyplus.lib.internal.HandyLoginEvent;

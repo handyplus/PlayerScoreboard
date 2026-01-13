@@ -1,10 +1,10 @@
-package cn.handyplus.template;
+package cn.handyplus.scoreboard;
 
 import cn.handyplus.lib.InitApi;
 import cn.handyplus.lib.constants.HookPluginEnum;
 import cn.handyplus.lib.util.HookPluginUtil;
 import cn.handyplus.lib.util.MessageUtil;
-import cn.handyplus.template.util.ConfigUtil;
+import cn.handyplus.scoreboard.util.ConfigUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -13,8 +13,8 @@ import org.bukkit.plugin.java.JavaPlugin;
  *
  * @author handy
  */
-public class Template extends JavaPlugin {
-    public static Template INSTANCE;
+public class PlayerScoreboard extends JavaPlugin {
+    public static PlayerScoreboard INSTANCE;
     public static boolean USE_PAPI;
 
     @Override

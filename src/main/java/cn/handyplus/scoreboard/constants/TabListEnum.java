@@ -1,4 +1,4 @@
-package cn.handyplus.template.constants;
+package cn.handyplus.scoreboard.constants;
 
 
 import lombok.AllArgsConstructor;

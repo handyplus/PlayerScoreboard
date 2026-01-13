@@ -1,9 +1,9 @@
-package cn.handyplus.template.command.admin;
+package cn.handyplus.scoreboard.command.admin;
 
 import cn.handyplus.lib.command.IHandyCommandEvent;
 import cn.handyplus.lib.util.BaseUtil;
 import cn.handyplus.lib.util.MessageUtil;
-import cn.handyplus.template.util.ConfigUtil;
+import cn.handyplus.scoreboard.util.ConfigUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
@@ -21,7 +21,7 @@ public class ReloadCommand implements IHandyCommandEvent {
 
     @Override
     public String permission() {
-        return "template.reload";
+        return "playerScoreboard.reload";
     }
 
     @Override
