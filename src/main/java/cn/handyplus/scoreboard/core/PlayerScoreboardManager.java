@@ -1,9 +1,12 @@
 package cn.handyplus.scoreboard.core;
 
 import cn.handyplus.lib.constants.BaseConstants;
+import cn.handyplus.lib.constants.VersionCheckEnum;
+import cn.handyplus.lib.internal.ServerTypeEnum;
 import cn.handyplus.lib.util.BaseUtil;
 import cn.handyplus.scoreboard.hook.PlaceholderApiUtil;
 import cn.handyplus.scoreboard.param.ScoreboardConfig;
+import io.papermc.paper.scoreboard.numbers.NumberFormat;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -106,10 +109,12 @@ public class PlayerScoreboardManager {
         boolean showSerialNo = BaseConstants.CONFIG.getBoolean("showSerialNo");
         int score = lines.size();
         for (String line : lines) {
-            if (showSerialNo) {
-                objective.getScore(BaseUtil.replaceChatColor(line)).setScore(score);
-            } else {
-                objective.getScore(BaseUtil.replaceChatColor(line));
+            org.bukkit.scoreboard.Score lineScore = objective.getScore(BaseUtil.replaceChatColor(line));
+            lineScore.setScore(score);
+            // 不显示数字时，使用空白格式隐藏（需要  Paper 1.20.3+）
+            if (!showSerialNo && ServerTypeEnum.PAPER.equals(ServerTypeEnum.getServerType())
+                    && BaseConstants.VERSION_ID >= VersionCheckEnum.V_1_20_3.getVersionId()) {
+                lineScore.numberFormat(NumberFormat.blank());
             }
             score--;
         }
