@@ -1,8 +1,13 @@
 package cn.handyplus.scoreboard.util;
 
+import cn.handyplus.lib.command.HandyCommandWrapper;
+import cn.handyplus.lib.constants.BaseConstants;
 import cn.handyplus.lib.util.HandyConfigUtil;
+import cn.handyplus.scoreboard.constants.ScoreboardConstants;
 import cn.handyplus.scoreboard.core.ScoreboardConfigManager;
 import org.bukkit.configuration.file.FileConfiguration;
+
+import java.util.Set;
 
 /**
  * 配置
@@ -23,6 +28,12 @@ public class ConfigUtil {
         SCOREBOARD_CONFIG = HandyConfigUtil.load("scoreboard.yml");
         // 加载计分板配置
         ScoreboardConfigManager.loadConfigs();
+        Set<String> commandAliasKey = HandyConfigUtil.getKey(BaseConstants.CONFIG, "commandAlias");
+        for (String key : commandAliasKey) {
+            ScoreboardConstants.COMMAND_MAP.put(key, BaseConstants.CONFIG.getString("commandAlias." + key));
+            // 动态注入命令
+            HandyCommandWrapper.injectCommand(key);
+        }
     }
 
 }

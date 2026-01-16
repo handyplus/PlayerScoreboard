@@ -9,3 +9,7 @@ isCheckUpdate: true
 
 # OP 登录时候是否发送更新提醒
 isCheckUpdateToOpMsg: true
+
+# 命令别名
+commandAlias:
+  sd: "psd toggle"

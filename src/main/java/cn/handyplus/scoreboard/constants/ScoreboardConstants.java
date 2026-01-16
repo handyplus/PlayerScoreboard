@@ -3,7 +3,9 @@ package cn.handyplus.scoreboard.constants;
 import cn.handyplus.scoreboard.param.ScoreboardConfig;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 常量
@@ -28,5 +30,11 @@ public final class ScoreboardConstants {
      * 所有世界标识
      */
     public static final String ALL = "[ALL]";
+
+    /**
+     * 命令映射
+     *
+     */
+    public static Map<String, String> COMMAND_MAP = new HashMap<>();
 
 }
