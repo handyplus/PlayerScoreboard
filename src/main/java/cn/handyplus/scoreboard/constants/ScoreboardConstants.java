@@ -17,14 +17,14 @@ public final class ScoreboardConstants {
     }
 
     /**
-     * 默认配置 key
-     */
-    public static final String DEFAULT_KEY = "default";
-
-    /**
-     * 缓存的计分板配置列表(按优先级排序)
+     * 缓存的计分板配置列表
      */
     public static List<ScoreboardConfig> SCOREBOARD_CONFIGS = new ArrayList<>();
+
+    /**
+     * 缓存的计分板外部自定义配置列表
+     */
+    public static Map<String, ScoreboardConfig> SCOREBOARD_EXTERNAL = new HashMap<>();
 
     /**
      * 所有世界标识

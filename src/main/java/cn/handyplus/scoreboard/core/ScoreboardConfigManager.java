@@ -29,15 +29,13 @@ public class ScoreboardConfigManager {
         ScoreboardConstants.SCOREBOARD_CONFIGS.clear();
         Set<String> scoreboardKeySet = HandyConfigUtil.getKey(ConfigUtil.SCOREBOARD_CONFIG, "scoreboards");
         for (String scoreboardKey : scoreboardKeySet) {
-            int priority = ConfigUtil.SCOREBOARD_CONFIG.getInt("scoreboards." + scoreboardKey + ".priority", 0);
-            String title = ConfigUtil.SCOREBOARD_CONFIG.getString("scoreboards." + scoreboardKey + ".title", "&a计分板");
             List<String> lines = ConfigUtil.SCOREBOARD_CONFIG.getStringList("scoreboards." + scoreboardKey + ".lines");
+            String title = ConfigUtil.SCOREBOARD_CONFIG.getString("scoreboards." + scoreboardKey + ".title");
+            int priority = ConfigUtil.SCOREBOARD_CONFIG.getInt("scoreboards." + scoreboardKey + ".priority", 0);
             List<String> worlds = ConfigUtil.SCOREBOARD_CONFIG.getStringList("scoreboards." + scoreboardKey + ".worlds");
-            ScoreboardConfig config = ScoreboardConfig.of(scoreboardKey, priority, title, lines, worlds);
+            ScoreboardConfig config = ScoreboardConfig.of(scoreboardKey, lines, title, priority, worlds);
             ScoreboardConstants.SCOREBOARD_CONFIGS.add(config);
         }
-        // 按优先级从高到低排序
-        ScoreboardConstants.SCOREBOARD_CONFIGS.sort(Comparator.comparingInt(ScoreboardConfig::getPriority).reversed());
     }
 
     /**
@@ -47,7 +45,14 @@ public class ScoreboardConfigManager {
      * @return 计分板配置
      */
     public static Optional<ScoreboardConfig> getPlayerScoreboardConfig(Player player) {
+        // 按优先级从高到低排序
+        ScoreboardConstants.SCOREBOARD_CONFIGS.sort(Comparator.comparingInt(ScoreboardConfig::getPriority).reversed());
         for (ScoreboardConfig config : ScoreboardConstants.SCOREBOARD_CONFIGS) {
+            // 注入外部自定义
+            ScoreboardConfig scoreboardExternalConfig = ScoreboardConstants.SCOREBOARD_EXTERNAL.get(config.getKey());
+            if (scoreboardExternalConfig != null) {
+                config.loadExternalConfig(scoreboardExternalConfig);
+            }
             // 检查世界限制
             List<String> worlds = config.getWorlds();
             if (CollUtil.isNotEmpty(worlds)) {
@@ -55,10 +60,6 @@ public class ScoreboardConfigManager {
                 if (!CollUtil.contains(worlds, ScoreboardConstants.ALL) && !CollUtil.contains(worlds, player.getWorld().getName())) {
                     continue;
                 }
-            }
-            // default 配置所有玩家都有权限
-            if (ScoreboardConstants.DEFAULT_KEY.equals(config.getKey())) {
-                return Optional.of(config);
             }
             // 检查玩家是否有对应权限
             if (player.hasPermission(config.getPermission())) {
