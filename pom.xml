@@ -12,8 +12,8 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <HandyLib.version>3.31.5</HandyLib.version>
-        <spigot-api.vesion>1.21.11-R0.1-SNAPSHOT</spigot-api.vesion>
+        <HandyLib.version>3.31.6</HandyLib.version>
+        <paper-api.vesion>1.21.11-R0.1-SNAPSHOT</paper-api.vesion>
         <placeholderapi.version>2.11.7</placeholderapi.version>
         <lombok.version>1.18.38</lombok.version>
         <annotations.version>26.0.2</annotations.version>
@@ -29,7 +29,7 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>${spigot-api.vesion}</version>
+            <version>${paper-api.vesion}</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
