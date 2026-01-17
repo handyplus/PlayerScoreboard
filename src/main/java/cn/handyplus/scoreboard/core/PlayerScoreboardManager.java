@@ -54,7 +54,7 @@ public class PlayerScoreboardManager {
         ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
         Scoreboard scoreboard = scoreboardManager.getNewScoreboard();
         PLAYER_SCOREBOARDS.put(player.getUniqueId(), scoreboard);
-        PLAYER_SCOREBOARD_ENABLED.put(player.getUniqueId(), true);
+        PLAYER_SCOREBOARD_ENABLED.putIfAbsent(player.getUniqueId(), true);
         player.setScoreboard(scoreboard);
     }
 
