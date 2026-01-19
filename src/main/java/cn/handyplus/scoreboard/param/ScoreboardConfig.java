@@ -112,6 +112,9 @@ public class ScoreboardConfig {
      * @param externalConfig 外部配置
      */
     public void loadExternalConfig(ScoreboardConfig externalConfig) {
+        if (externalConfig == null) {
+            return;
+        }
         this.lines = CollUtil.isNotEmpty(externalConfig.getLines()) ? externalConfig.getLines() : this.lines;
         this.title = StrUtil.isNotEmpty(externalConfig.getTitle()) ? externalConfig.getTitle() : this.title;
         this.priority = externalConfig.getPriority() != null ? externalConfig.getPriority() : this.priority;

@@ -18,6 +18,17 @@ public class PlayerScoreboardApi {
     }
 
     /**
+     * 获取对应 key 的计分板数据
+     *
+     * @param key 配置 key
+     */
+    public static ScoreboardConfig get(@NotNull String key) {
+        ScoreboardConfig scoreboardConfig = ScoreboardConstants.SCOREBOARD_CONFIGS.get(key);
+        scoreboardConfig.loadExternalConfig(ScoreboardConstants.SCOREBOARD_EXTERNAL.get(key));
+        return scoreboardConfig;
+    }
+
+    /**
      * 自定义对应 key 的计分板数据
      *
      * @param key   配置 key

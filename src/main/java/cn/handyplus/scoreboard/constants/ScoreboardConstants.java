@@ -19,7 +19,7 @@ public final class ScoreboardConstants {
     /**
      * 缓存的计分板配置列表
      */
-    public static List<ScoreboardConfig> SCOREBOARD_CONFIGS = new ArrayList<>();
+    public static Map<String, ScoreboardConfig> SCOREBOARD_CONFIGS = new HashMap<>();
 
     /**
      * 缓存的计分板外部自定义配置列表

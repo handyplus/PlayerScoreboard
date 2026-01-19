@@ -34,7 +34,7 @@ public class ScoreboardConfigManager {
             int priority = ConfigUtil.SCOREBOARD_CONFIG.getInt("scoreboards." + scoreboardKey + ".priority", 0);
             List<String> worlds = ConfigUtil.SCOREBOARD_CONFIG.getStringList("scoreboards." + scoreboardKey + ".worlds");
             ScoreboardConfig config = ScoreboardConfig.of(scoreboardKey, lines, title, priority, worlds);
-            ScoreboardConstants.SCOREBOARD_CONFIGS.add(config);
+            ScoreboardConstants.SCOREBOARD_CONFIGS.put(scoreboardKey, config);
         }
     }
 
@@ -45,28 +45,23 @@ public class ScoreboardConfigManager {
      * @return 计分板配置
      */
     public static Optional<ScoreboardConfig> getPlayerScoreboardConfig(Player player) {
-        // 按优先级从高到低排序
-        ScoreboardConstants.SCOREBOARD_CONFIGS.sort(Comparator.comparingInt(ScoreboardConfig::getPriority).reversed());
-        for (ScoreboardConfig config : ScoreboardConstants.SCOREBOARD_CONFIGS) {
-            // 注入外部自定义
-            ScoreboardConfig scoreboardExternalConfig = ScoreboardConstants.SCOREBOARD_EXTERNAL.get(config.getKey());
-            if (scoreboardExternalConfig != null) {
-                config.loadExternalConfig(scoreboardExternalConfig);
-            }
-            // 检查世界限制
-            List<String> worlds = config.getWorlds();
-            if (CollUtil.isNotEmpty(worlds)) {
-                // 如果配置了 [ALL] 则表示所有世界都允许
-                if (!CollUtil.contains(worlds, ScoreboardConstants.ALL) && !CollUtil.contains(worlds, player.getWorld().getName())) {
-                    continue;
-                }
-            }
-            // 检查玩家是否有对应权限
-            if (player.hasPermission(config.getPermission())) {
-                return Optional.of(config);
-            }
-        }
-        return Optional.empty();
+        // 按优先级从高到低排序遍历
+        return ScoreboardConstants.SCOREBOARD_CONFIGS.values().stream()
+                .sorted(Comparator.comparingInt(ScoreboardConfig::getPriority).reversed())
+                .filter(config -> {
+                    // 注入外部自定义
+                    config.loadExternalConfig(ScoreboardConstants.SCOREBOARD_EXTERNAL.get(config.getKey()));
+                    // 检查世界限制
+                    List<String> worlds = config.getWorlds();
+                    if (CollUtil.isNotEmpty(worlds)) {
+                        // 如果配置了 [ALL] 则表示所有世界都允许
+                        if (!CollUtil.contains(worlds, ScoreboardConstants.ALL) && !CollUtil.contains(worlds, player.getWorld().getName())) {
+                            return false;
+                        }
+                    }
+                    // 检查玩家是否有对应权限
+                    return player.hasPermission(config.getPermission());
+                }).findFirst();
     }
 
 }
