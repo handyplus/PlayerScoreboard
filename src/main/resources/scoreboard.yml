@@ -67,3 +67,13 @@ scoreboards:
       - "&7"
       - "&e当前时间: &f%server_time_HH:mm:ss%"
       - "&7━━━━━━━━━━━━━━━━"
+  # 任务计分板 用于 PlayerTask 扩展
+  task:
+    priority: -1
+    title: "&a&l当前任务"
+    # 可显示的世界 [ALL] 表示全部
+    worlds:
+      - "world"
+      - "world_nether"
+      - "world_the_end"
+    lines: [ ]
