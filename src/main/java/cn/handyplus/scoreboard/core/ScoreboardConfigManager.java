@@ -47,6 +47,9 @@ public class ScoreboardConfigManager {
     public static Optional<ScoreboardConfig> getPlayerScoreboardConfig(Player player) {
         // 按优先级从高到低排序遍历(使用合并后的优先级,取外部插件设置的最大值)
         return ScoreboardConstants.SCOREBOARD_CONFIGS.values().stream()
+                // 过滤出优先级大于等于 0 的配置
+                .filter(config -> config.getMergedPriority(player.getUniqueId()) >= 0)
+                // 按优先级降序排序
                 .sorted(Comparator.comparingInt((ScoreboardConfig config) -> config.getMergedPriority(player.getUniqueId())).reversed())
                 .filter(config -> {
                     // 检查世界限制

@@ -1,6 +1,7 @@
 # 计分板配置文件
 # 支持多配置,按优先级从高到低排序
 # 权限格式: PlayerScoreboard.{key} 例如: PlayerScoreboard.vip
+# 优先级 为负数的不会显示
 
 # 计分板配置列表
 scoreboards:
