@@ -1,14 +1,21 @@
 package cn.handyplus.scoreboard.api;
 
+import cn.handyplus.lib.core.MapUtil;
 import cn.handyplus.scoreboard.constants.ScoreboardConstants;
+import cn.handyplus.scoreboard.param.ExternalLine;
 import cn.handyplus.scoreboard.param.ScoreboardConfig;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.UUID;
 
 /**
- * API
+ * 计分板API
+ * 供其他插件调用,对计分板进行扩展操作
+ * 支持玩家级别的个性化内容(如任务进度等)
  *
  * @author handy
  */
@@ -18,55 +25,111 @@ public class PlayerScoreboardApi {
     }
 
     /**
-     * 获取对应 key 的计分板数据
+     * 设置指定玩家计分板的标题
      *
-     * @param key 配置 key
+     * @param plugin        插件实例
+     * @param player        玩家
+     * @param scoreboardKey 计分板配置 key
+     * @param title         标题
      */
-    public static ScoreboardConfig get(@NotNull String key) {
-        ScoreboardConfig scoreboardConfig = ScoreboardConstants.SCOREBOARD_CONFIGS.get(key);
-        scoreboardConfig.loadExternalConfig(ScoreboardConstants.SCOREBOARD_EXTERNAL.get(key));
-        return scoreboardConfig;
+    public static void setTitle(@NotNull Plugin plugin, @NotNull Player player, @NotNull String scoreboardKey, @NotNull String title) {
+        ScoreboardConfig config = getOrCreateConfig(plugin, player.getUniqueId(), scoreboardKey);
+        config.setTitle(title);
     }
 
     /**
-     * 自定义对应 key 的计分板数据
+     * 设置指定玩家计分板的内容
      *
-     * @param key   配置 key
-     * @param lines 计分板内容行
+     * @param plugin        插件实例
+     * @param player        玩家
+     * @param scoreboardKey 计分板配置 key
+     * @param lines         要追加的行内容
      */
-    public static void set(@NotNull String key, @NotNull List<String> lines) {
-        set(key, lines, null);
+    public static void addLines(@NotNull Plugin plugin, @NotNull Player player, @NotNull String scoreboardKey, @NotNull ExternalLine lines) {
+        ScoreboardConfig config = getOrCreateConfig(plugin, player.getUniqueId(), scoreboardKey);
+        config.setExternalLine(lines);
     }
 
     /**
-     * 自定义对应 key 的计分板数据
+     * 设置指定玩家计分板的优先级
      *
-     * @param key   配置 key
-     * @param lines 计分板内容行
-     * @param title 计分板标题
+     * @param plugin        插件实例
+     * @param player        玩家
+     * @param scoreboardKey 计分板配置 key
+     * @param priority      优先级(数字越大优先级越高)
      */
-    public static void set(@NotNull String key, @NotNull List<String> lines, @Nullable String title) {
-        set(ScoreboardConfig.of(key, lines, title));
+    public static void setPriority(@NotNull Plugin plugin, @NotNull Player player, @NotNull String scoreboardKey, int priority) {
+        ScoreboardConfig config = getOrCreateConfig(plugin, player.getUniqueId(), scoreboardKey);
+        config.setPriority(priority);
     }
 
     /**
-     * 自定义对应 key 的计分板数据
+     * 清除该插件注册的指定玩家的指定计分板配置
      *
-     * @param scoreboard 自定义的计分板数据
+     * @param plugin        插件实例
+     * @param player        玩家
+     * @param scoreboardKey 计分板配置 key
      */
-    public static void set(@NotNull ScoreboardConfig scoreboard) {
-        ScoreboardConstants.SCOREBOARD_EXTERNAL.put(scoreboard.getKey(), scoreboard);
-    }
-
-    /**
-     * 自定义对应 key 的计分板数据
-     *
-     * @param scoreboardList 自定义的计分板数据
-     */
-    public static void setBatch(@NotNull List<ScoreboardConfig> scoreboardList) {
-        for (ScoreboardConfig scoreboard : scoreboardList) {
-            ScoreboardConstants.SCOREBOARD_EXTERNAL.put(scoreboard.getKey(), scoreboard);
+    public static void clear(@NotNull Plugin plugin, @NotNull Player player, @NotNull String scoreboardKey) {
+        Map<UUID, Map<String, ScoreboardConfig>> pluginConfigs = ScoreboardConstants.SCOREBOARD_EXTERNAL.get(plugin);
+        if (pluginConfigs != null) {
+            Map<String, ScoreboardConfig> playerConfigs = pluginConfigs.get(player.getUniqueId());
+            if (playerConfigs != null) {
+                playerConfigs.remove(scoreboardKey);
+            }
         }
+    }
+
+    /**
+     * 清除该插件注册的指定玩家的所有计分板配置
+     *
+     * @param plugin 插件实例
+     * @param player 玩家
+     */
+    public static void clear(@NotNull Plugin plugin, @NotNull Player player) {
+        Map<UUID, Map<String, ScoreboardConfig>> pluginConfigs = ScoreboardConstants.SCOREBOARD_EXTERNAL.get(plugin);
+        if (pluginConfigs != null) {
+            pluginConfigs.remove(player.getUniqueId());
+        }
+    }
+
+    /**
+     * 清除该插件注册的所有计分板配置
+     *
+     * @param plugin 插件实例
+     */
+    public static void clear(@NotNull Plugin plugin) {
+        ScoreboardConstants.SCOREBOARD_EXTERNAL.remove(plugin);
+    }
+
+    /**
+     * 清除指定玩家的所有外部计分板配置(玩家退出时调用)
+     *
+     * @param playerUuid 玩家 UUID
+     */
+    public static void clearPlayer(@NotNull UUID playerUuid) {
+        for (Map<UUID, Map<String, ScoreboardConfig>> pluginConfigs : ScoreboardConstants.SCOREBOARD_EXTERNAL.values()) {
+            pluginConfigs.remove(playerUuid);
+        }
+    }
+
+    /**
+     * 获取或创建插件的玩家计分板配置
+     *
+     * @param plugin        插件实例
+     * @param playerUuid    玩家 UUID
+     * @param scoreboardKey 计分板配置 key
+     * @return 计分板配置
+     */
+    private static ScoreboardConfig getOrCreateConfig(Plugin plugin, UUID playerUuid, String scoreboardKey) {
+        Map<UUID, Map<String, ScoreboardConfig>> pluginConfigs = ScoreboardConstants.SCOREBOARD_EXTERNAL.computeIfAbsent(plugin, k -> MapUtil.of());
+        Map<String, ScoreboardConfig> playerConfigs = pluginConfigs.computeIfAbsent(playerUuid, k -> MapUtil.of());
+        ScoreboardConfig config = playerConfigs.get(scoreboardKey);
+        if (config == null) {
+            config = ScoreboardConfig.of(scoreboardKey, new ArrayList<>());
+            playerConfigs.put(scoreboardKey, config);
+        }
+        return config;
     }
 
 }

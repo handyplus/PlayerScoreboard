@@ -45,12 +45,10 @@ public class ScoreboardConfigManager {
      * @return 计分板配置
      */
     public static Optional<ScoreboardConfig> getPlayerScoreboardConfig(Player player) {
-        // 按优先级从高到低排序遍历
+        // 按优先级从高到低排序遍历(使用合并后的优先级,取外部插件设置的最大值)
         return ScoreboardConstants.SCOREBOARD_CONFIGS.values().stream()
-                .sorted(Comparator.comparingInt(ScoreboardConfig::getPriority).reversed())
+                .sorted(Comparator.comparingInt((ScoreboardConfig config) -> config.getMergedPriority(player.getUniqueId())).reversed())
                 .filter(config -> {
-                    // 注入外部自定义
-                    config.loadExternalConfig(ScoreboardConstants.SCOREBOARD_EXTERNAL.get(config.getKey()));
                     // 检查世界限制
                     List<String> worlds = config.getWorlds();
                     if (CollUtil.isNotEmpty(worlds)) {
@@ -61,7 +59,8 @@ public class ScoreboardConfigManager {
                     }
                     // 检查玩家是否有对应权限
                     return player.hasPermission(config.getPermission());
-                }).findFirst();
+                })
+                .findFirst();
     }
 
 }

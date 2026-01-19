@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 
@@ -96,21 +97,20 @@ public class PlayerScoreboardManager {
         if (oldObjective != null) {
             oldObjective.unregister();
         }
-        // 标题和内容行的变量解析
-        String title = PlaceholderApiUtil.set(player, scoreboardConfig.getTitle());
-        List<String> lines = PlaceholderApiUtil.set(player, scoreboardConfig.getLines());
+        // 标题和内容行的变量解析(使用合并后的内容,包含外部插件扩展)
+        String title = PlaceholderApiUtil.set(player, scoreboardConfig.getMergedTitle(player.getUniqueId()));
+        List<String> lines = PlaceholderApiUtil.set(player, scoreboardConfig.getMergedLines(player.getUniqueId()));
         // 创建新目标
         Objective objective = scoreboard.registerNewObjective(OBJECTIVE_NAME, "dummy", BaseUtil.replaceChatColor(title));
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         // 设置内容行
-        boolean showSerialNo = BaseConstants.CONFIG.getBoolean("showSerialNo");
+        boolean showSerialNo = BaseConstants.CONFIG.getBoolean("showSerialNo") && ServerTypeEnum.PAPER.equals(ServerTypeEnum.getServerType()) && BaseConstants.VERSION_ID >= VersionCheckEnum.V_1_20_3.getVersionId();
         int score = lines.size();
         for (String line : lines) {
-            org.bukkit.scoreboard.Score lineScore = objective.getScore(BaseUtil.replaceChatColor(line));
+            Score lineScore = objective.getScore(BaseUtil.replaceChatColor(line));
             lineScore.setScore(score);
-            // 不显示数字时，使用空白格式隐藏（需要  Paper 1.20.3+）
-            if (!showSerialNo && ServerTypeEnum.PAPER.equals(ServerTypeEnum.getServerType())
-                    && BaseConstants.VERSION_ID >= VersionCheckEnum.V_1_20_3.getVersionId()) {
+            // 不显示数字时，使用空白格式隐藏（需要 Paper 1.20.3+）
+            if (!showSerialNo) {
                 lineScore.numberFormat(NumberFormat.blank());
             }
             score--;

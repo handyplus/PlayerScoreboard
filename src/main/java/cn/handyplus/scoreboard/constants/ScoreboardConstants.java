@@ -1,11 +1,11 @@
 package cn.handyplus.scoreboard.constants;
 
 import cn.handyplus.scoreboard.param.ScoreboardConfig;
+import org.bukkit.plugin.Plugin;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * 常量
@@ -22,9 +22,11 @@ public final class ScoreboardConstants {
     public static Map<String, ScoreboardConfig> SCOREBOARD_CONFIGS = new HashMap<>();
 
     /**
-     * 缓存的计分板外部自定义配置列表
+     * 缓存的计分板外部自定义配置列表(玩家级别)
+     * key: 插件实例
+     * value: 玩家UUID -> 该插件注册的计分板配置(key为计分板配置key)
      */
-    public static Map<String, ScoreboardConfig> SCOREBOARD_EXTERNAL = new HashMap<>();
+    public static Map<Plugin, Map<UUID, Map<String, ScoreboardConfig>>> SCOREBOARD_EXTERNAL = new HashMap<>();
 
     /**
      * 所有世界标识
@@ -33,7 +35,6 @@ public final class ScoreboardConstants {
 
     /**
      * 命令映射
-     *
      */
     public static Map<String, String> COMMAND_MAP = new HashMap<>();
 

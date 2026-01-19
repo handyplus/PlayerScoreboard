@@ -7,7 +7,7 @@ scoreboards:
   # OP 配置 (最高优先级)
   op:
     # 优先级,数字越大优先级越高
-    priority: 100
+    priority: 20
     # 可显示的世界 [ALL] 表示全部
     worlds:
       - "world"
@@ -31,7 +31,7 @@ scoreboards:
 
   # VIP 配置
   vip:
-    priority: 50
+    priority: 10
     title: "&b&l服务器计分板 &e[VIP]"
     # 可显示的世界 [ALL] 表示全部
     worlds:
@@ -51,7 +51,7 @@ scoreboards:
 
   # 默认配置 (最低优先级,所有玩家都有权限)
   default:
-    priority: 0
+    priority: 1
     title: "&a&l服务器计分板"
     # 可显示的世界 [ALL] 表示全部
     worlds:
