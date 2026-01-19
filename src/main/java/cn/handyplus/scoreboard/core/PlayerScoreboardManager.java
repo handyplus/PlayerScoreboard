@@ -14,6 +14,7 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
+import org.bukkit.scoreboard.Team;
 
 import java.util.List;
 import java.util.Map;
@@ -171,6 +172,50 @@ public class PlayerScoreboardManager {
      */
     public static boolean isScoreboardEnabled(Player player) {
         return PLAYER_SCOREBOARD_ENABLED.getOrDefault(player.getUniqueId(), true);
+    }
+
+    /**
+     * 获取玩家的计分板
+     *
+     * @param playerUuid 玩家 UUID
+     * @return 玩家的计分板,如果不存在则返回null
+     */
+    public static Scoreboard getScoreboard(UUID playerUuid) {
+        return PLAYER_SCOREBOARDS.get(playerUuid);
+    }
+
+    /**
+     * 同步玩家的计分板Team到所有在线玩家
+     * 用于让其他玩家看到该玩家的Tab前缀/后缀
+     *
+     * @param player 目标玩家
+     */
+    public static void syncScoreboardToAll(Player player) {
+        Scoreboard scoreboard = PLAYER_SCOREBOARDS.get(player.getUniqueId());
+        if (scoreboard == null) {
+            return;
+        }
+        // 将该玩家的 Team 信息同步到所有在线玩家的计分板上
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            if (onlinePlayer.equals(player)) {
+                continue;
+            }
+            Scoreboard targetBoard = PLAYER_SCOREBOARDS.get(onlinePlayer.getUniqueId());
+            if (targetBoard == null) {
+                continue;
+            }
+            // 复制 Team 信息
+            Team sourceTeam = scoreboard.getTeam(player.getName());
+            if (sourceTeam != null) {
+                Team targetTeam = targetBoard.getTeam(player.getName());
+                if (targetTeam == null) {
+                    targetTeam = targetBoard.registerNewTeam(player.getName());
+                }
+                targetTeam.setPrefix(sourceTeam.getPrefix());
+                targetTeam.setSuffix(sourceTeam.getSuffix());
+                targetTeam.addEntry(player.getName());
+            }
+        }
     }
 
 }

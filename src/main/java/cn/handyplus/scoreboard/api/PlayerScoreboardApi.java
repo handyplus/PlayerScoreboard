@@ -2,11 +2,15 @@ package cn.handyplus.scoreboard.api;
 
 import cn.handyplus.lib.core.MapUtil;
 import cn.handyplus.scoreboard.constants.ScoreboardConstants;
+import cn.handyplus.scoreboard.core.PlayerScoreboardManager;
 import cn.handyplus.scoreboard.param.ExternalLine;
 import cn.handyplus.scoreboard.param.ScoreboardConfig;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -23,6 +27,8 @@ public class PlayerScoreboardApi {
 
     private PlayerScoreboardApi() {
     }
+
+    // ==================== 计分板内容相关 API ====================
 
     /**
      * 设置指定玩家计分板的标题
@@ -111,6 +117,108 @@ public class PlayerScoreboardApi {
         for (Map<UUID, Map<String, ScoreboardConfig>> pluginConfigs : ScoreboardConstants.SCOREBOARD_EXTERNAL.values()) {
             pluginConfigs.remove(playerUuid);
         }
+    }
+
+    // ==================== Team 相关 API ====================
+
+    /**
+     * 设置玩家在Tab列表中的前缀
+     * 会在玩家的计分板上创建/更新Team
+     *
+     * @param player 玩家
+     * @param prefix 前缀
+     */
+    public static void setTabPrefix(@NotNull Player player, @NotNull String prefix) {
+        setTabPrefixAndSuffix(player, prefix, "");
+    }
+
+    /**
+     * 设置玩家在Tab列表中的后缀
+     * 会在玩家的计分板上创建/更新Team
+     *
+     * @param player 玩家
+     * @param suffix 后缀
+     */
+    public static void setTabSuffix(@NotNull Player player, @NotNull String suffix) {
+        setTabPrefixAndSuffix(player, "", suffix);
+    }
+
+    /**
+     * 设置玩家在Tab列表中的前缀和后缀
+     * 会在玩家的计分板上创建/更新Team
+     *
+     * @param player 玩家
+     * @param prefix 前缀
+     * @param suffix 后缀
+     */
+    public static void setTabPrefixAndSuffix(@NotNull Player player, @NotNull String prefix, @NotNull String suffix) {
+        Team team = getOrCreateTeam(player, player.getName());
+        if (team != null) {
+            team.setPrefix(prefix);
+            team.setSuffix(suffix);
+            team.addEntry(player.getName());
+        }
+        // 同步到所有玩家
+        syncToAllPlayers(player);
+    }
+
+    /**
+     * 移除玩家的Tab Team
+     *
+     * @param player 玩家
+     */
+    public static void removeTabTeam(@NotNull Player player) {
+        Scoreboard scoreboard = getScoreboard(player);
+        if (scoreboard != null) {
+            Team team = scoreboard.getTeam(player.getName());
+            if (team != null) {
+                team.unregister();
+            }
+        }
+    }
+
+    // ==================== 私有方法 ====================
+
+    /**
+     * 同步玩家的计分板到所有在线玩家
+     * 用于让其他玩家看到该玩家的Tab前缀/后缀
+     *
+     * @param player 目标玩家
+     */
+    private static void syncToAllPlayers(@NotNull Player player) {
+        PlayerScoreboardManager.syncScoreboardToAll(player);
+    }
+
+    /**
+     * 获取玩家的计分板
+     * 其他插件可以通过此方法获取玩家的计分板,在上面注册Team等
+     *
+     * @param player 玩家
+     * @return 玩家的计分板,如果不存在则返回null
+     */
+    @Nullable
+    private static Scoreboard getScoreboard(@NotNull Player player) {
+        return PlayerScoreboardManager.getScoreboard(player.getUniqueId());
+    }
+
+    /**
+     * 获取或创建玩家计分板上的 Team
+     *
+     * @param player   玩家
+     * @param teamName Team 名称
+     * @return Team对象,如果玩家计分板不存在则返回null
+     */
+    @Nullable
+    private static Team getOrCreateTeam(@NotNull Player player, @NotNull String teamName) {
+        Scoreboard scoreboard = getScoreboard(player);
+        if (scoreboard == null) {
+            return null;
+        }
+        Team team = scoreboard.getTeam(teamName);
+        if (team == null) {
+            team = scoreboard.registerNewTeam(teamName);
+        }
+        return team;
     }
 
     /**

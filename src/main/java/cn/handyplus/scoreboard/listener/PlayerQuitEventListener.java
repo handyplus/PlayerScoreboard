@@ -42,6 +42,8 @@ public class PlayerQuitEventListener implements Listener {
         PlayerScoreboardManager.removeScoreboard(player);
         // 清理玩家的外部扩展数据
         PlayerScoreboardApi.clearPlayer(player.getUniqueId());
+        // 移除玩家所属队伍
+        PlayerScoreboardApi.removeTabTeam(player);
     }
 
 }

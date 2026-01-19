@@ -24,7 +24,7 @@ public final class ScoreboardConstants {
     /**
      * 缓存的计分板外部自定义配置列表(玩家级别)
      * key: 插件实例
-     * value: 玩家UUID -> 该插件注册的计分板配置(key为计分板配置key)
+     * value: 玩家 UUID -> 该插件注册的计分板配置(key为计分板配置key)
      */
     public static Map<Plugin, Map<UUID, Map<String, ScoreboardConfig>>> SCOREBOARD_EXTERNAL = new HashMap<>();
 
