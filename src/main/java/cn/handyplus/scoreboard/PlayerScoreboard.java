@@ -28,7 +28,7 @@ public class PlayerScoreboard extends JavaPlugin {
         USE_PAPI = HookPluginUtil.hook(HookPluginEnum.PLACEHOLDER_API);
 
         // 初始化
-        initApi.addMetrics(0)
+        initApi.addMetrics(28917)
                 .checkVersion()
                 .initCommand("cn.handyplus.scoreboard.command")
                 .initClickEvent("cn.handyplus.scoreboard.listener.gui")
