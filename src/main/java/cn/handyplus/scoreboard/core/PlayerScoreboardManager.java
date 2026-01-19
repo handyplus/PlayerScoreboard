@@ -207,4 +207,38 @@ public class PlayerScoreboardManager {
         }
     }
 
+    /**
+     * 同步所有在线玩家的Team信息到指定玩家
+     * 用于玩家刚登录时，获取其他玩家的Tab前缀/后缀
+     *
+     * @param player 目标玩家
+     */
+    public static void syncAllToPlayer(Player player) {
+        Scoreboard targetBoard = PLAYER_SCOREBOARDS.get(player.getUniqueId());
+        if (targetBoard == null) {
+            return;
+        }
+        // 将所有在线玩家的 Team 信息同步到该玩家的计分板上
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            if (onlinePlayer.equals(player)) {
+                continue;
+            }
+            Scoreboard sourceBoard = PLAYER_SCOREBOARDS.get(onlinePlayer.getUniqueId());
+            if (sourceBoard == null) {
+                continue;
+            }
+            // 复制 Team 信息
+            Team sourceTeam = sourceBoard.getTeam(onlinePlayer.getName());
+            if (sourceTeam != null) {
+                Team targetTeam = targetBoard.getTeam(onlinePlayer.getName());
+                if (targetTeam == null) {
+                    targetTeam = targetBoard.registerNewTeam(onlinePlayer.getName());
+                }
+                targetTeam.setPrefix(sourceTeam.getPrefix());
+                targetTeam.setSuffix(sourceTeam.getSuffix());
+                targetTeam.addEntry(onlinePlayer.getName());
+            }
+        }
+    }
+
 }

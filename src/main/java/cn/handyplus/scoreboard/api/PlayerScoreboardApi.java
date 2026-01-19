@@ -166,6 +166,8 @@ public class PlayerScoreboardApi {
         }
         // 同步到所有玩家
         PlayerScoreboardManager.syncScoreboardToAll(player);
+        // 同步其他玩家的信息到自己
+        PlayerScoreboardManager.syncAllToPlayer(player);
     }
 
     /**
