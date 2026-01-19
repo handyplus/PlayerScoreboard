@@ -41,6 +41,7 @@ public class PlayerScoreboardApi {
     public static void setTitle(@NotNull Plugin plugin, @NotNull Player player, @NotNull String scoreboardKey, @NotNull String title) {
         ScoreboardConfig config = getOrCreateConfig(plugin, player.getUniqueId(), scoreboardKey);
         config.setTitle(title);
+        PlayerScoreboardManager.updateScoreboard(player);
     }
 
     /**
@@ -54,6 +55,7 @@ public class PlayerScoreboardApi {
     public static void addLines(@NotNull Plugin plugin, @NotNull Player player, @NotNull String scoreboardKey, @NotNull ExternalLine lines) {
         ScoreboardConfig config = getOrCreateConfig(plugin, player.getUniqueId(), scoreboardKey);
         config.setExternalLine(lines);
+        PlayerScoreboardManager.updateScoreboard(player);
     }
 
     /**
@@ -67,6 +69,7 @@ public class PlayerScoreboardApi {
     public static void setPriority(@NotNull Plugin plugin, @NotNull Player player, @NotNull String scoreboardKey, int priority) {
         ScoreboardConfig config = getOrCreateConfig(plugin, player.getUniqueId(), scoreboardKey);
         config.setPriority(priority);
+        PlayerScoreboardManager.updateScoreboard(player);
     }
 
     /**
@@ -82,6 +85,7 @@ public class PlayerScoreboardApi {
             Map<String, ScoreboardConfig> playerConfigs = pluginConfigs.get(player.getUniqueId());
             if (playerConfigs != null) {
                 playerConfigs.remove(scoreboardKey);
+                PlayerScoreboardManager.updateScoreboard(player);
             }
         }
     }
@@ -96,6 +100,7 @@ public class PlayerScoreboardApi {
         Map<UUID, Map<String, ScoreboardConfig>> pluginConfigs = ScoreboardConstants.SCOREBOARD_EXTERNAL.get(plugin);
         if (pluginConfigs != null) {
             pluginConfigs.remove(player.getUniqueId());
+            PlayerScoreboardManager.updateScoreboard(player);
         }
     }
 
@@ -159,7 +164,7 @@ public class PlayerScoreboardApi {
             team.addEntry(player.getName());
         }
         // 同步到所有玩家
-        syncToAllPlayers(player);
+        PlayerScoreboardManager.syncScoreboardToAll(player);
     }
 
     /**
@@ -178,16 +183,6 @@ public class PlayerScoreboardApi {
     }
 
     // ==================== 私有方法 ====================
-
-    /**
-     * 同步玩家的计分板到所有在线玩家
-     * 用于让其他玩家看到该玩家的Tab前缀/后缀
-     *
-     * @param player 目标玩家
-     */
-    private static void syncToAllPlayers(@NotNull Player player) {
-        PlayerScoreboardManager.syncScoreboardToAll(player);
-    }
 
     /**
      * 获取玩家的计分板

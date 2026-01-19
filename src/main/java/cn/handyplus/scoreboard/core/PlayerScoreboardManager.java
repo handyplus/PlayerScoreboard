@@ -66,17 +66,16 @@ public class PlayerScoreboardManager {
      * @param player 玩家
      */
     public static void updateScoreboard(Player player) {
-        if (!isScoreboardEnabled(player)) {
-            return;
-        }
         // 获取或创建计分板
         UUID uuid = player.getUniqueId();
         if (PLAYER_SCOREBOARDS.get(uuid) == null) {
             createScoreboard(player);
         }
+        // 玩家是否开启计分板
+        Boolean isScoreboardEnabled = PLAYER_SCOREBOARD_ENABLED.getOrDefault(player.getUniqueId(), true);
         // 获取计分板配置
         Optional<ScoreboardConfig> configOpt = ScoreboardConfigManager.getPlayerScoreboardConfig(player);
-        if (!configOpt.isPresent()) {
+        if (!configOpt.isPresent() || !isScoreboardEnabled) {
             // 如果没有配置则移除计分板内容
             hideScoreboard(player.getUniqueId());
         } else {
@@ -162,16 +161,6 @@ public class PlayerScoreboardManager {
         if (objective != null) {
             objective.unregister();
         }
-    }
-
-    /**
-     * 检查玩家计分板是否启用
-     *
-     * @param player 玩家
-     * @return 是否启用
-     */
-    public static boolean isScoreboardEnabled(Player player) {
-        return PLAYER_SCOREBOARD_ENABLED.getOrDefault(player.getUniqueId(), true);
     }
 
     /**
