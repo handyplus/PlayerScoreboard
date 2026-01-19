@@ -10,9 +10,7 @@ scoreboards:
     priority: 20
     # 可显示的世界 [ALL] 表示全部
     worlds:
-      - "world"
-      - "world_nether"
-      - "world_the_end"
+      - "[ALL]"
     # 计分板标题
     title: "&6&l服务器计分板 &c[OP]"
     # 计分板内容,从上到下显示
@@ -35,9 +33,7 @@ scoreboards:
     title: "&b&l服务器计分板 &e[VIP]"
     # 可显示的世界 [ALL] 表示全部
     worlds:
-      - "world"
-      - "world_nether"
-      - "world_the_end"
+      - "[ALL]"
     lines:
       - "&7━━━━━━━━━━━━━━━━"
       - "&e玩家: &f%player_name%"
@@ -55,9 +51,7 @@ scoreboards:
     title: "&a&l服务器计分板"
     # 可显示的世界 [ALL] 表示全部
     worlds:
-      - "world"
-      - "world_nether"
-      - "world_the_end"
+      - "[ALL]"
     lines:
       - "&7━━━━━━━━━━━━━━━━"
       - "&e玩家: &f%player_name%"
@@ -73,7 +67,5 @@ scoreboards:
     title: "&a&l当前任务"
     # 可显示的世界 [ALL] 表示全部
     worlds:
-      - "world"
-      - "world_nether"
-      - "world_the_end"
+      - "[ALL]"
     lines: [ ]
