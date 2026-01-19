@@ -1,5 +1,6 @@
 package cn.handyplus.scoreboard.api;
 
+import cn.handyplus.lib.constants.VersionCheckEnum;
 import cn.handyplus.lib.core.MapUtil;
 import cn.handyplus.scoreboard.constants.ScoreboardConstants;
 import cn.handyplus.scoreboard.core.PlayerScoreboardManager;
@@ -159,8 +160,8 @@ public class PlayerScoreboardApi {
     public static void setTabPrefixAndSuffix(@NotNull Player player, @NotNull String prefix, @NotNull String suffix) {
         Team team = getOrCreateTeam(player, player.getName());
         if (team != null) {
-            team.setPrefix(prefix);
-            team.setSuffix(suffix);
+            team.setPrefix(truncateToVersionLimit(prefix));
+            team.setSuffix(truncateToVersionLimit(suffix));
             team.addEntry(player.getName());
         }
         // 同步到所有玩家
@@ -233,6 +234,21 @@ public class PlayerScoreboardApi {
             playerConfigs.put(scoreboardKey, config);
         }
         return config;
+    }
+
+    /**
+     * 根据服务端版本截断字符串到计分板允许的最大长度。
+     * 1.13 之前限制 16 字符，1.13 及之后限制 64 字符。
+     */
+    private static String truncateToVersionLimit(@NotNull String str) {
+        int versionId = VersionCheckEnum.getEnum().getVersionId();
+        if (versionId < VersionCheckEnum.V_1_13.getVersionId() && str.length() > 16) {
+            return str.substring(0, 16);
+        }
+        if (versionId >= VersionCheckEnum.V_1_13.getVersionId() && str.length() > 64) {
+            return str.substring(0, 64);
+        }
+        return str;
     }
 
 }
