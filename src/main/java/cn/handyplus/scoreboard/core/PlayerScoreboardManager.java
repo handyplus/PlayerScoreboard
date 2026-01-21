@@ -100,14 +100,15 @@ public class PlayerScoreboardManager {
         // 标题和内容行的变量解析(使用合并后的内容,包含外部插件扩展)
         String title = PlaceholderApiUtil.set(player, scoreboardConfig.getMergedTitle(player.getUniqueId()));
         List<String> lines = PlaceholderApiUtil.set(player, scoreboardConfig.getMergedLines(player.getUniqueId()));
-        // 创建新目标
-        Objective objective = scoreboard.registerNewObjective(OBJECTIVE_NAME, "dummy", BaseUtil.replaceChatColor(title));
+        // 创建新目标(标题在1.13-最大32字符)
+        Objective objective = scoreboard.registerNewObjective(OBJECTIVE_NAME, "dummy", BaseUtil.replaceChatColor(truncateTitle(title)));
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         // 设置内容行
         boolean showSerialNo = BaseConstants.CONFIG.getBoolean("showSerialNo") && ServerTypeEnum.PAPER.equals(ServerTypeEnum.getServerType()) && BaseConstants.VERSION_ID >= VersionCheckEnum.V_1_20_3.getVersionId();
         int score = lines.size();
         for (String line : lines) {
-            Score lineScore = objective.getScore(BaseUtil.replaceChatColor(line));
+            // 内容行在1.13-最大30字符
+            Score lineScore = objective.getScore(BaseUtil.replaceChatColor(truncateLine(line)));
             lineScore.setScore(score);
             // 不显示数字时，使用空白格式隐藏（需要 Paper 1.20.3+）
             if (!showSerialNo) {
@@ -115,6 +116,34 @@ public class PlayerScoreboardManager {
             }
             score--;
         }
+    }
+
+    /**
+     * 截断标题到版本允许的最大长度
+     * 1.13- 最大32字符
+     *
+     * @param title 标题
+     * @return 截断后的标题
+     */
+    private static String truncateTitle(String title) {
+        if (BaseConstants.VERSION_ID < VersionCheckEnum.V_1_13.getVersionId() && title.length() > 32) {
+            return title.substring(0, 32);
+        }
+        return title;
+    }
+
+    /**
+     * 截断内容行到版本允许的最大长度
+     * 1.13- 最大30字符
+     *
+     * @param line 内容行
+     * @return 截断后的内容行
+     */
+    private static String truncateLine(String line) {
+        if (BaseConstants.VERSION_ID < VersionCheckEnum.V_1_13.getVersionId() && line.length() > 30) {
+            return line.substring(0, 30);
+        }
+        return line;
     }
 
     /**
