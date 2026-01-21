@@ -2,19 +2,21 @@ package cn.handyplus.scoreboard.core;
 
 import cn.handyplus.lib.constants.BaseConstants;
 import cn.handyplus.lib.constants.VersionCheckEnum;
-import cn.handyplus.lib.internal.ServerTypeEnum;
+import cn.handyplus.lib.internal.HandySchedulerUtil;
 import cn.handyplus.lib.util.BaseUtil;
+import cn.handyplus.scoreboard.constants.ScoreboardConstants;
 import cn.handyplus.scoreboard.hook.PlaceholderApiUtil;
 import cn.handyplus.scoreboard.param.ScoreboardConfig;
+import cn.handyplus.scoreboard.util.LegacyComponentUtil;
 import io.papermc.paper.scoreboard.numbers.NumberFormat;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
-import org.bukkit.scoreboard.Team;
 
 import java.util.List;
 import java.util.Map;
@@ -38,11 +40,6 @@ public class PlayerScoreboardManager {
      * 玩家计分板启用状态
      */
     private static final Map<UUID, Boolean> PLAYER_SCOREBOARD_ENABLED = new ConcurrentHashMap<>();
-
-    /**
-     * 计分板目标名称
-     */
-    private static final String OBJECTIVE_NAME = "psd_board";
 
     private PlayerScoreboardManager() {
     }
@@ -93,27 +90,61 @@ public class PlayerScoreboardManager {
     private static void updateScoreboardContent(Player player, ScoreboardConfig scoreboardConfig) {
         Scoreboard scoreboard = PLAYER_SCOREBOARDS.get(player.getUniqueId());
         // 移除旧的目标
-        Objective oldObjective = scoreboard.getObjective(OBJECTIVE_NAME);
+        Objective oldObjective = scoreboard.getObjective(ScoreboardConstants.OBJECTIVE_NAME);
         if (oldObjective != null) {
             oldObjective.unregister();
         }
         // 标题和内容行的变量解析(使用合并后的内容,包含外部插件扩展)
         String title = PlaceholderApiUtil.set(player, scoreboardConfig.getMergedTitle(player.getUniqueId()));
         List<String> lines = PlaceholderApiUtil.set(player, scoreboardConfig.getMergedLines(player.getUniqueId()));
-        // 创建新目标(标题在1.13-最大32字符)
-        Objective objective = scoreboard.registerNewObjective(OBJECTIVE_NAME, "dummy", BaseUtil.replaceChatColor(truncateTitle(title)));
+
+        // 根据是否为 Paper 1.16+ 选择不同的实现(Component API 需要 Paper 1.16.5+)
+        if (isPaperComponent()) {
+            updateScoreboardContentPaper(scoreboard, title, lines);
+        } else {
+            updateScoreboardContentSpigot(scoreboard, title, lines);
+        }
+    }
+
+    /**
+     * Paper 服务端更新计分板内容(使用 Component API)
+     */
+    private static void updateScoreboardContentPaper(Scoreboard scoreboard, String title, List<String> lines) {
+        // 创建新目标(使用 Component API)
+        Objective objective = scoreboard.registerNewObjective(ScoreboardConstants.OBJECTIVE_NAME, Criteria.DUMMY, LegacyComponentUtil.toComponent(title));
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         // 设置内容行
-        boolean showSerialNo = BaseConstants.CONFIG.getBoolean("showSerialNo") && ServerTypeEnum.PAPER.equals(ServerTypeEnum.getServerType()) && BaseConstants.VERSION_ID >= VersionCheckEnum.V_1_20_3.getVersionId();
+        boolean showSerialNo = BaseConstants.CONFIG.getBoolean("showSerialNo") && BaseConstants.VERSION_ID >= VersionCheckEnum.V_1_20_3.getVersionId();
         int score = lines.size();
-        for (String line : lines) {
-            // 内容行在1.13-最大30字符
-            Score lineScore = objective.getScore(BaseUtil.replaceChatColor(truncateLine(line)));
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i);
+            // 用索引生成唯一 entry，避免相同内容被合并
+            String entry = String.valueOf(i);
+            Score lineScore = objective.getScore(entry);
+            lineScore.customName(LegacyComponentUtil.toComponent(line));
             lineScore.setScore(score);
             // 不显示数字时，使用空白格式隐藏（需要 Paper 1.20.3+）
             if (!showSerialNo) {
                 lineScore.numberFormat(NumberFormat.blank());
             }
+            score--;
+        }
+    }
+
+    /**
+     * Spigot 服务端更新计分板内容(使用传统字符串 API)
+     */
+    @SuppressWarnings("deprecation")
+    private static void updateScoreboardContentSpigot(Scoreboard scoreboard, String title, List<String> lines) {
+        // 创建新目标(标题在1.13-最大32字符)
+        Objective objective = scoreboard.registerNewObjective(ScoreboardConstants.OBJECTIVE_NAME, "dummy", BaseUtil.replaceChatColor(truncateTitle(title)));
+        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        // 设置内容行
+        int score = lines.size();
+        for (String line : lines) {
+            // 内容行在1.13- 最大 30 字符
+            Score lineScore = objective.getScore(BaseUtil.replaceChatColor(truncateLine(line)));
+            lineScore.setScore(score);
             score--;
         }
     }
@@ -130,20 +161,6 @@ public class PlayerScoreboardManager {
             return title.substring(0, 32);
         }
         return title;
-    }
-
-    /**
-     * 截断内容行到版本允许的最大长度
-     * 1.13- 最大30字符
-     *
-     * @param line 内容行
-     * @return 截断后的内容行
-     */
-    private static String truncateLine(String line) {
-        if (BaseConstants.VERSION_ID < VersionCheckEnum.V_1_13.getVersionId() && line.length() > 30) {
-            return line.substring(0, 30);
-        }
-        return line;
     }
 
     /**
@@ -177,6 +194,23 @@ public class PlayerScoreboardManager {
     }
 
     /**
+     * 获取玩家的计分板
+     *
+     * @param playerUuid 玩家 UUID
+     * @return 玩家的计分板,如果不存在则返回null
+     */
+    protected static Scoreboard getScoreboard(UUID playerUuid) {
+        return PLAYER_SCOREBOARDS.get(playerUuid);
+    }
+
+    /**
+     * 判断是否支持 Component API (Paper 1.16.5+)
+     */
+    protected static boolean isPaperComponent() {
+        return (HandySchedulerUtil.isFolia() || HandySchedulerUtil.isPaper()) && BaseConstants.VERSION_ID >= VersionCheckEnum.V_1_16.getVersionId();
+    }
+
+    /**
      * 隐藏玩家计分板
      *
      * @param playerUuid 玩家 UUID
@@ -186,88 +220,24 @@ public class PlayerScoreboardManager {
         if (scoreboard == null) {
             return;
         }
-        Objective objective = scoreboard.getObjective(OBJECTIVE_NAME);
+        Objective objective = scoreboard.getObjective(ScoreboardConstants.OBJECTIVE_NAME);
         if (objective != null) {
             objective.unregister();
         }
     }
 
     /**
-     * 获取玩家的计分板
+     * 截断内容行到版本允许的最大长度
+     * 1.13- 最大 30 字符
      *
-     * @param playerUuid 玩家 UUID
-     * @return 玩家的计分板,如果不存在则返回null
+     * @param line 内容行
+     * @return 截断后的内容行
      */
-    public static Scoreboard getScoreboard(UUID playerUuid) {
-        return PLAYER_SCOREBOARDS.get(playerUuid);
-    }
-
-    /**
-     * 同步玩家的计分板Team到所有在线玩家
-     * 用于让其他玩家看到该玩家的Tab前缀/后缀
-     *
-     * @param player 目标玩家
-     */
-    public static void syncScoreboardToAll(Player player) {
-        Scoreboard scoreboard = PLAYER_SCOREBOARDS.get(player.getUniqueId());
-        if (scoreboard == null) {
-            return;
+    private static String truncateLine(String line) {
+        if (BaseConstants.VERSION_ID < VersionCheckEnum.V_1_13.getVersionId() && line.length() > 30) {
+            return line.substring(0, 30);
         }
-        // 将该玩家的 Team 信息同步到所有在线玩家的计分板上
-        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            if (onlinePlayer.equals(player)) {
-                continue;
-            }
-            Scoreboard targetBoard = PLAYER_SCOREBOARDS.get(onlinePlayer.getUniqueId());
-            if (targetBoard == null) {
-                continue;
-            }
-            // 复制 Team 信息
-            Team sourceTeam = scoreboard.getTeam(player.getName());
-            if (sourceTeam != null) {
-                Team targetTeam = targetBoard.getTeam(player.getName());
-                if (targetTeam == null) {
-                    targetTeam = targetBoard.registerNewTeam(player.getName());
-                }
-                targetTeam.setPrefix(sourceTeam.getPrefix());
-                targetTeam.setSuffix(sourceTeam.getSuffix());
-                targetTeam.addEntry(player.getName());
-            }
-        }
-    }
-
-    /**
-     * 同步所有在线玩家的Team信息到指定玩家
-     * 用于玩家刚登录时，获取其他玩家的Tab前缀/后缀
-     *
-     * @param player 目标玩家
-     */
-    public static void syncAllToPlayer(Player player) {
-        Scoreboard targetBoard = PLAYER_SCOREBOARDS.get(player.getUniqueId());
-        if (targetBoard == null) {
-            return;
-        }
-        // 将所有在线玩家的 Team 信息同步到该玩家的计分板上
-        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            if (onlinePlayer.equals(player)) {
-                continue;
-            }
-            Scoreboard sourceBoard = PLAYER_SCOREBOARDS.get(onlinePlayer.getUniqueId());
-            if (sourceBoard == null) {
-                continue;
-            }
-            // 复制 Team 信息
-            Team sourceTeam = sourceBoard.getTeam(onlinePlayer.getName());
-            if (sourceTeam != null) {
-                Team targetTeam = targetBoard.getTeam(onlinePlayer.getName());
-                if (targetTeam == null) {
-                    targetTeam = targetBoard.registerNewTeam(onlinePlayer.getName());
-                }
-                targetTeam.setPrefix(sourceTeam.getPrefix());
-                targetTeam.setSuffix(sourceTeam.getSuffix());
-                targetTeam.addEntry(onlinePlayer.getName());
-            }
-        }
+        return line;
     }
 
 }

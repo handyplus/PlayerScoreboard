@@ -1,11 +1,12 @@
 name: PlayerScoreboard
 main: cn.handyplus.scoreboard.PlayerScoreboard
-version: 1.0.0
+version: 1.0.1
 author: handy
 website: https://ricedoc.handyplus.cn/wiki/PlayerScoreboard/log/
 api-version: 1.13
 description: 玩家计分板
 softdepend: [ PlaceholderAPI,AuthMe,CatSeedLogin,OauthLogin ]
+folia-supported: true
 commands:
   playerScoreboard:
     description: 玩家计分板

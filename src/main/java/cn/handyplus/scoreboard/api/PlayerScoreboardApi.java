@@ -1,17 +1,14 @@
 package cn.handyplus.scoreboard.api;
 
-import cn.handyplus.lib.constants.VersionCheckEnum;
 import cn.handyplus.lib.core.MapUtil;
 import cn.handyplus.scoreboard.constants.ScoreboardConstants;
 import cn.handyplus.scoreboard.core.PlayerScoreboardManager;
+import cn.handyplus.scoreboard.core.PlayerTeamManager;
 import cn.handyplus.scoreboard.param.ExternalLine;
 import cn.handyplus.scoreboard.param.ScoreboardConfig;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -158,16 +155,7 @@ public class PlayerScoreboardApi {
      * @param suffix 后缀
      */
     public static void setTabPrefixAndSuffix(@NotNull Player player, @NotNull String prefix, @NotNull String suffix) {
-        Team team = getOrCreateTeam(player, player.getName());
-        if (team != null) {
-            team.setPrefix(truncateToVersionLimit(prefix));
-            team.setSuffix(truncateToVersionLimit(suffix));
-            team.addEntry(player.getName());
-        }
-        // 同步到所有玩家
-        PlayerScoreboardManager.syncScoreboardToAll(player);
-        // 同步其他玩家的信息到自己
-        PlayerScoreboardManager.syncAllToPlayer(player);
+        PlayerTeamManager.setTabPrefixAndSuffix(player, prefix, suffix);
     }
 
     /**
@@ -176,47 +164,7 @@ public class PlayerScoreboardApi {
      * @param player 玩家
      */
     public static void removeTabTeam(@NotNull Player player) {
-        Scoreboard scoreboard = getScoreboard(player);
-        if (scoreboard != null) {
-            Team team = scoreboard.getTeam(player.getName());
-            if (team != null) {
-                team.unregister();
-            }
-        }
-    }
-
-    // ==================== 私有方法 ====================
-
-    /**
-     * 获取玩家的计分板
-     * 其他插件可以通过此方法获取玩家的计分板,在上面注册Team等
-     *
-     * @param player 玩家
-     * @return 玩家的计分板,如果不存在则返回null
-     */
-    @Nullable
-    private static Scoreboard getScoreboard(@NotNull Player player) {
-        return PlayerScoreboardManager.getScoreboard(player.getUniqueId());
-    }
-
-    /**
-     * 获取或创建玩家计分板上的 Team
-     *
-     * @param player   玩家
-     * @param teamName Team 名称
-     * @return Team对象,如果玩家计分板不存在则返回null
-     */
-    @Nullable
-    private static Team getOrCreateTeam(@NotNull Player player, @NotNull String teamName) {
-        Scoreboard scoreboard = getScoreboard(player);
-        if (scoreboard == null) {
-            return null;
-        }
-        Team team = scoreboard.getTeam(teamName);
-        if (team == null) {
-            team = scoreboard.registerNewTeam(teamName);
-        }
-        return team;
+        PlayerTeamManager.removeTabTeam(player);
     }
 
     /**
@@ -236,21 +184,6 @@ public class PlayerScoreboardApi {
             playerConfigs.put(scoreboardKey, config);
         }
         return config;
-    }
-
-    /**
-     * 根据服务端版本截断字符串到计分板允许的最大长度。
-     * 1.13 之前限制 16 字符，1.13 及之后限制 64 字符。
-     */
-    private static String truncateToVersionLimit(@NotNull String str) {
-        int versionId = VersionCheckEnum.getEnum().getVersionId();
-        if (versionId < VersionCheckEnum.V_1_13.getVersionId() && str.length() > 16) {
-            return str.substring(0, 16);
-        }
-        if (versionId >= VersionCheckEnum.V_1_13.getVersionId() && str.length() > 64) {
-            return str.substring(0, 64);
-        }
-        return str;
     }
 
 }

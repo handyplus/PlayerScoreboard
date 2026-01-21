@@ -34,6 +34,11 @@ public final class ScoreboardConstants {
     public static final String ALL = "[ALL]";
 
     /**
+     * 计分板目标名称
+     */
+    public static final String OBJECTIVE_NAME = "psd_board";
+
+    /**
      * 命令映射
      */
     public static Map<String, String> COMMAND_MAP = new HashMap<>();
