@@ -98,23 +98,25 @@ public class PlayerScoreboardManager {
         String title = PlaceholderApiUtil.set(player, scoreboardConfig.getMergedTitle(player.getUniqueId()));
         List<String> lines = PlaceholderApiUtil.set(player, scoreboardConfig.getMergedLines(player.getUniqueId()));
 
-        // 根据是否为 Paper 1.16+ 选择不同的实现(Component API 需要 Paper 1.16.5+)
-        if (isPaperComponent()) {
+        // 根据版本选择不同的实现
+        if (isPaperScoreCustomName()) {
+            // Paper 1.20.4+ 支持 Score.customName 和 Component Objective
             updateScoreboardContentPaper(scoreboard, title, lines);
         } else {
-            updateScoreboardContentSpigot(scoreboard, title, lines);
+            // 其他版本使用传统字符串 API
+            updateScoreboardContentLegacy(scoreboard, title, lines);
         }
     }
 
     /**
-     * Paper 服务端更新计分板内容(使用 Component API)
+     * Paper 1.20.4+ 更新计分板内容(使用 Score.customName API)
      */
     private static void updateScoreboardContentPaper(Scoreboard scoreboard, String title, List<String> lines) {
         // 创建新目标(使用 Component API)
         Objective objective = scoreboard.registerNewObjective(ScoreboardConstants.OBJECTIVE_NAME, Criteria.DUMMY, LegacyComponentUtil.toComponent(title));
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         // 设置内容行
-        boolean showSerialNo = BaseConstants.CONFIG.getBoolean("showSerialNo") && BaseConstants.VERSION_ID >= VersionCheckEnum.V_1_20_3.getVersionId();
+        boolean showSerialNo = BaseConstants.CONFIG.getBoolean("showSerialNo");
         int score = lines.size();
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i);
@@ -123,7 +125,7 @@ public class PlayerScoreboardManager {
             Score lineScore = objective.getScore(entry);
             lineScore.customName(LegacyComponentUtil.toComponent(line));
             lineScore.setScore(score);
-            // 不显示数字时，使用空白格式隐藏（需要 Paper 1.20.3+）
+            // 不显示数字时，使用空白格式隐藏
             if (!showSerialNo) {
                 lineScore.numberFormat(NumberFormat.blank());
             }
@@ -132,10 +134,10 @@ public class PlayerScoreboardManager {
     }
 
     /**
-     * Spigot 服务端更新计分板内容(使用传统字符串 API)
+     * 传统方式更新计分板内容(Paper 1.20.3- 和 Spigot)
      */
     @SuppressWarnings("deprecation")
-    private static void updateScoreboardContentSpigot(Scoreboard scoreboard, String title, List<String> lines) {
+    private static void updateScoreboardContentLegacy(Scoreboard scoreboard, String title, List<String> lines) {
         // 创建新目标(标题在1.13-最大32字符)
         Objective objective = scoreboard.registerNewObjective(ScoreboardConstants.OBJECTIVE_NAME, "dummy", BaseUtil.replaceChatColor(truncateTitle(title)));
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
@@ -208,6 +210,13 @@ public class PlayerScoreboardManager {
      */
     protected static boolean isPaperComponent() {
         return (HandySchedulerUtil.isFolia() || HandySchedulerUtil.isPaper()) && BaseConstants.VERSION_ID >= VersionCheckEnum.V_1_16.getVersionId();
+    }
+
+    /**
+     * 判断是否支持 Score.customName API (Paper 1.20.4+)
+     */
+    private static boolean isPaperScoreCustomName() {
+        return isPaperComponent() && BaseConstants.VERSION_ID >= VersionCheckEnum.V_1_20_4.getVersionId();
     }
 
     /**
