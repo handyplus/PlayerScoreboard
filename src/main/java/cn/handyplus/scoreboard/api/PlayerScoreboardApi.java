@@ -112,7 +112,8 @@ public class PlayerScoreboardApi {
     }
 
     /**
-     * 清除指定玩家的所有外部计分板配置(玩家退出时调用)
+     * 清除指定玩家的所有外部计分板配置
+     * 玩家退出时PlayerScoreboard插件会自动调用
      *
      * @param playerUuid 玩家 UUID
      */
@@ -160,6 +161,7 @@ public class PlayerScoreboardApi {
 
     /**
      * 移除玩家的Tab Team
+     * 玩家退出时PlayerScoreboard插件会自动调用
      *
      * @param player 玩家
      */
