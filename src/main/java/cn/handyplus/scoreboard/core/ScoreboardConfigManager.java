@@ -2,6 +2,7 @@ package cn.handyplus.scoreboard.core;
 
 import cn.handyplus.lib.core.CollUtil;
 import cn.handyplus.lib.util.HandyConfigUtil;
+import cn.handyplus.lib.util.MessageUtil;
 import cn.handyplus.scoreboard.constants.ScoreboardConstants;
 import cn.handyplus.scoreboard.param.ScoreboardConfig;
 import cn.handyplus.scoreboard.util.ConfigUtil;
@@ -46,7 +47,7 @@ public class ScoreboardConfigManager {
      */
     public static Optional<ScoreboardConfig> getPlayerScoreboardConfig(Player player) {
         // 按优先级从高到低排序遍历(使用合并后的优先级,取外部插件设置的最大值)
-        return ScoreboardConstants.SCOREBOARD_CONFIGS.values().stream()
+        Optional<ScoreboardConfig> first = ScoreboardConstants.SCOREBOARD_CONFIGS.values().stream()
                 // 过滤出优先级大于等于 0 的配置
                 .filter(config -> config.getMergedPriority(player.getUniqueId()) >= 0)
                 // 按优先级降序排序
@@ -64,6 +65,8 @@ public class ScoreboardConfigManager {
                     return player.hasPermission(config.getPermission());
                 })
                 .findFirst();
+        MessageUtil.sendConsoleDebugMessage("getPlayerScoreboardConfig: 玩家=" + player.getName() + ", 计分板=" + first.map(ScoreboardConfig::getKey).orElse("无"));
+        return first;
     }
 
 }
