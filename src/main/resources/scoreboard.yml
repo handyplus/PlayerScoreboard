@@ -70,3 +70,11 @@ scoreboards:
     worlds:
       - "[ALL]"
     lines: [ ]
+  # 公会任务计分板 用于 PlayerGuild 扩展
+  guild:
+    priority: -1
+    title: "&a&l当前公会任务"
+    # 可显示的世界 [ALL] 表示全部
+    worlds:
+      - "[ALL]"
+    lines: [ ]
