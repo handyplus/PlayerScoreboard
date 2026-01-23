@@ -119,6 +119,12 @@ public class PlayerScoreboardManager {
         } else {
             // 更新标题
             objective.displayName(LegacyComponentUtil.toComponent(title));
+            // 清理所有旧的 entries（防止切换计分板时旧内容残留）
+            for (String entry : scoreboard.getEntries()) {
+                if (objective.getScore(entry).isScoreSet()) {
+                    scoreboard.resetScores(entry);
+                }
+            }
         }
 
         // 设置内容行
@@ -136,12 +142,6 @@ public class PlayerScoreboardManager {
                 lineScore.numberFormat(NumberFormat.blank());
             }
             score--;
-        }
-
-        // 清理多余的旧行（当新内容行数比旧的少时）
-        for (int i = lines.size(); i < 15; i++) {
-            String entry = String.valueOf(i);
-            scoreboard.resetScores(entry);
         }
     }
 
