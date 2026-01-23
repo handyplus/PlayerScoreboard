@@ -89,32 +89,38 @@ public class PlayerScoreboardManager {
      */
     private static void updateScoreboardContent(Player player, ScoreboardConfig scoreboardConfig) {
         Scoreboard scoreboard = PLAYER_SCOREBOARDS.get(player.getUniqueId());
-        // 移除旧的目标
-        Objective oldObjective = scoreboard.getObjective(ScoreboardConstants.OBJECTIVE_NAME);
-        if (oldObjective != null) {
-            oldObjective.unregister();
-        }
         // 标题和内容行的变量解析(使用合并后的内容,包含外部插件扩展)
         String title = PlaceholderApiUtil.set(player, scoreboardConfig.getMergedTitle(player.getUniqueId()));
         List<String> lines = PlaceholderApiUtil.set(player, scoreboardConfig.getMergedLines(player.getUniqueId()));
 
         // 根据版本选择不同的实现
         if (isPaperScoreCustomName()) {
-            // Paper 1.20.4+ 支持 Score.customName 和 Component Objective
+            // Paper 1.20.4+ 支持 Score.customName 和 Component Objective（无闪烁更新）
             updateScoreboardContentPaper(scoreboard, title, lines);
         } else {
-            // 其他版本使用传统字符串 API
+            // 其他版本使用传统字符串 API（需要重建 Objective）
+            Objective oldObjective = scoreboard.getObjective(ScoreboardConstants.OBJECTIVE_NAME);
+            if (oldObjective != null) {
+                oldObjective.unregister();
+            }
             updateScoreboardContentLegacy(scoreboard, title, lines);
         }
     }
 
     /**
-     * Paper 1.20.4+ 更新计分板内容(使用 Score.customName API)
+     * Paper 1.20.4+ 更新计分板内容(使用 Score.customName API，无闪烁)
      */
     private static void updateScoreboardContentPaper(Scoreboard scoreboard, String title, List<String> lines) {
-        // 创建新目标(使用 Component API)
-        Objective objective = scoreboard.registerNewObjective(ScoreboardConstants.OBJECTIVE_NAME, Criteria.DUMMY, LegacyComponentUtil.toComponent(title));
-        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        // 获取或创建 Objective（不删除重建，避免闪烁）
+        Objective objective = scoreboard.getObjective(ScoreboardConstants.OBJECTIVE_NAME);
+        if (objective == null) {
+            objective = scoreboard.registerNewObjective(ScoreboardConstants.OBJECTIVE_NAME, Criteria.DUMMY, LegacyComponentUtil.toComponent(title));
+            objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        } else {
+            // 更新标题
+            objective.displayName(LegacyComponentUtil.toComponent(title));
+        }
+
         // 设置内容行
         boolean showSerialNo = BaseConstants.CONFIG.getBoolean("showSerialNo");
         int score = lines.size();
@@ -130,6 +136,12 @@ public class PlayerScoreboardManager {
                 lineScore.numberFormat(NumberFormat.blank());
             }
             score--;
+        }
+
+        // 清理多余的旧行（当新内容行数比旧的少时）
+        for (int i = lines.size(); i < 15; i++) {
+            String entry = String.valueOf(i);
+            scoreboard.resetScores(entry);
         }
     }
 
