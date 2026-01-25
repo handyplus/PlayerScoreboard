@@ -121,27 +121,23 @@ public class PlayerScoreboardManager {
             objective.displayName(LegacyComponentUtil.toComponent(title));
         }
 
-        // 设置内容行
+        // 清理超出新行数的旧 entry
+        for (int i = lines.size(); i < 20; i++) {
+            scoreboard.resetScores(String.valueOf(i));
+        }
+
+        // 设置内容行（使用固定的 score 值，避免 score 变化导致重复显示）
         boolean showSerialNo = BaseConstants.CONFIG.getBoolean("showSerialNo");
-        int score = lines.size();
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i);
-            // 用索引生成唯一 entry，避免相同内容被合并
             String entry = String.valueOf(i);
             Score lineScore = objective.getScore(entry);
             lineScore.customName(LegacyComponentUtil.toComponent(line));
-            lineScore.setScore(score);
-            // 不显示数字时，使用空白格式隐藏
+            // score 用固定值：20-i，这样无论 lines 多少行，同一个 entry 的 score 始终不变
+            lineScore.setScore(20 - i);
             if (!showSerialNo) {
                 lineScore.numberFormat(NumberFormat.blank());
             }
-            score--;
-        }
-
-        // 清理多余的旧行（当新内容行数比旧的少时）
-        for (int i = lines.size(); i < 15; i++) {
-            String entry = String.valueOf(i);
-            scoreboard.resetScores(entry);
         }
     }
 
