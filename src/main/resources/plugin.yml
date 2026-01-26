@@ -5,7 +5,7 @@ author: handy
 website: https://ricedoc.handyplus.cn/wiki/PlayerScoreboard/log/
 api-version: 1.13
 description: 玩家计分板
-softdepend: [ PlaceholderAPI,AuthMe,CatSeedLogin,OauthLogin ]
+softdepend: [ PlaceholderAPI, AuthMe, CatSeedLogin, OauthLogin ]
 folia-supported: true
 commands:
   playerScoreboard:
