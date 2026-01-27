@@ -2,7 +2,6 @@ package cn.handyplus.scoreboard.core;
 
 import cn.handyplus.lib.constants.BaseConstants;
 import cn.handyplus.lib.constants.VersionCheckEnum;
-import cn.handyplus.lib.core.LockUtil;
 import cn.handyplus.lib.internal.HandySchedulerUtil;
 import cn.handyplus.lib.util.BaseUtil;
 import cn.handyplus.scoreboard.constants.ScoreboardConstants;
@@ -17,7 +16,6 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.ScoreboardManager;
 
 import java.util.List;
 import java.util.Map;
@@ -52,19 +50,9 @@ public class PlayerScoreboardManager {
      */
     public static void createScoreboard(Player player) {
         UUID uuid = player.getUniqueId();
-        // 加锁，防止登录时与定时刷新任务并发
-        if (!LockUtil.tryPass(ScoreboardConstants.OBJECTIVE_NAME + uuid)) {
-            return;
-        }
-        try {
-            ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
-            Scoreboard scoreboard = scoreboardManager.getNewScoreboard();
-            PLAYER_SCOREBOARDS.put(uuid, scoreboard);
-            PLAYER_SCOREBOARD_ENABLED.putIfAbsent(uuid, true);
-            player.setScoreboard(scoreboard);
-        } finally {
-            LockUtil.done(ScoreboardConstants.OBJECTIVE_NAME + uuid);
-        }
+        Scoreboard scoreboard = PLAYER_SCOREBOARDS.computeIfAbsent(uuid, k -> Bukkit.getScoreboardManager().getNewScoreboard());
+        PLAYER_SCOREBOARD_ENABLED.putIfAbsent(uuid, true);
+        player.setScoreboard(scoreboard);
     }
 
     /**
