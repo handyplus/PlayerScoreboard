@@ -2,6 +2,7 @@ package cn.handyplus.scoreboard.core;
 
 import cn.handyplus.lib.constants.BaseConstants;
 import cn.handyplus.lib.constants.VersionCheckEnum;
+import cn.handyplus.lib.core.LockUtil;
 import cn.handyplus.lib.internal.HandySchedulerUtil;
 import cn.handyplus.lib.util.BaseUtil;
 import cn.handyplus.scoreboard.constants.ScoreboardConstants;
@@ -50,11 +51,20 @@ public class PlayerScoreboardManager {
      * @param player 玩家
      */
     public static void createScoreboard(Player player) {
-        ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
-        Scoreboard scoreboard = scoreboardManager.getNewScoreboard();
-        PLAYER_SCOREBOARDS.put(player.getUniqueId(), scoreboard);
-        PLAYER_SCOREBOARD_ENABLED.putIfAbsent(player.getUniqueId(), true);
-        player.setScoreboard(scoreboard);
+        UUID uuid = player.getUniqueId();
+        // 加锁，防止登录时与定时刷新任务并发
+        if (!LockUtil.tryPass(ScoreboardConstants.OBJECTIVE_NAME + uuid)) {
+            return;
+        }
+        try {
+            ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
+            Scoreboard scoreboard = scoreboardManager.getNewScoreboard();
+            PLAYER_SCOREBOARDS.put(uuid, scoreboard);
+            PLAYER_SCOREBOARD_ENABLED.putIfAbsent(uuid, true);
+            player.setScoreboard(scoreboard);
+        } finally {
+            LockUtil.done(ScoreboardConstants.OBJECTIVE_NAME + uuid);
+        }
     }
 
     /**
@@ -63,18 +73,19 @@ public class PlayerScoreboardManager {
      * @param player 玩家
      */
     public static void updateScoreboard(Player player) {
-        // 获取或创建计分板
         UUID uuid = player.getUniqueId();
-        if (PLAYER_SCOREBOARDS.get(uuid) == null) {
+        // 获取或创建计分板
+        Scoreboard scoreboard = PLAYER_SCOREBOARDS.get(uuid);
+        if (scoreboard == null) {
             createScoreboard(player);
         }
         // 玩家是否开启计分板
-        Boolean isScoreboardEnabled = PLAYER_SCOREBOARD_ENABLED.getOrDefault(player.getUniqueId(), true);
+        Boolean isScoreboardEnabled = PLAYER_SCOREBOARD_ENABLED.getOrDefault(uuid, true);
         // 获取计分板配置
         Optional<ScoreboardConfig> configOpt = ScoreboardConfigManager.getPlayerScoreboardConfig(player);
         if (!configOpt.isPresent() || !isScoreboardEnabled) {
             // 如果没有配置则移除计分板内容
-            hideScoreboard(player.getUniqueId());
+            hideScoreboard(uuid);
         } else {
             // 更新计分板内容
             updateScoreboardContent(player, configOpt.get());
@@ -89,6 +100,9 @@ public class PlayerScoreboardManager {
      */
     private static void updateScoreboardContent(Player player, ScoreboardConfig scoreboardConfig) {
         Scoreboard scoreboard = PLAYER_SCOREBOARDS.get(player.getUniqueId());
+        if (scoreboard == null) {
+            return;
+        }
         // 标题和内容行的变量解析(使用合并后的内容,包含外部插件扩展)
         String title = PlaceholderApiUtil.set(player, scoreboardConfig.getMergedTitle(player.getUniqueId()));
         List<String> lines = PlaceholderApiUtil.set(player, scoreboardConfig.getMergedLines(player.getUniqueId()));
