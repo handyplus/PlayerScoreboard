@@ -149,8 +149,9 @@ public class PlayerScoreboardManager {
     @SuppressWarnings("deprecation")
     private static void updateScoreboardContentLegacy(Scoreboard scoreboard, String title, List<String> lines) {
         // 创建新目标(标题在1.13-最大32字符)
-        Objective objective = scoreboard.registerNewObjective(ScoreboardConstants.OBJECTIVE_NAME, "dummy", BaseUtil.replaceChatColor(truncateTitle(title)));
+        Objective objective = scoreboard.registerNewObjective(ScoreboardConstants.OBJECTIVE_NAME, "dummy");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        objective.setDisplayName(BaseUtil.replaceChatColor(title));
         // 设置内容行
         int score = lines.size();
         for (String line : lines) {
