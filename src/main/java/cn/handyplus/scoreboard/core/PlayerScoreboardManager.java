@@ -2,12 +2,11 @@ package cn.handyplus.scoreboard.core;
 
 import cn.handyplus.lib.constants.BaseConstants;
 import cn.handyplus.lib.constants.VersionCheckEnum;
-import cn.handyplus.lib.internal.HandySchedulerUtil;
 import cn.handyplus.lib.util.BaseUtil;
+import cn.handyplus.lib.util.ComponentUtil;
 import cn.handyplus.scoreboard.constants.ScoreboardConstants;
 import cn.handyplus.scoreboard.hook.PlaceholderApiUtil;
 import cn.handyplus.scoreboard.param.ScoreboardConfig;
-import cn.handyplus.scoreboard.util.LegacyComponentUtil;
 import io.papermc.paper.scoreboard.numbers.NumberFormat;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -96,7 +95,7 @@ public class PlayerScoreboardManager {
         List<String> lines = PlaceholderApiUtil.set(player, scoreboardConfig.getMergedLines(player.getUniqueId()));
 
         // 根据版本选择不同的实现
-        if (isPaperScoreCustomName()) {
+        if (BaseUtil.isHigherVersion()) {
             // Paper 1.20.4+ 支持 Score.customName 和 Component Objective（无闪烁更新）
             updateScoreboardContentPaper(scoreboard, title, lines);
         } else {
@@ -116,11 +115,11 @@ public class PlayerScoreboardManager {
         // 获取或创建 Objective（不删除重建，避免闪烁）
         Objective objective = scoreboard.getObjective(ScoreboardConstants.OBJECTIVE_NAME);
         if (objective == null) {
-            objective = scoreboard.registerNewObjective(ScoreboardConstants.OBJECTIVE_NAME, Criteria.DUMMY, LegacyComponentUtil.toComponent(title));
+            objective = scoreboard.registerNewObjective(ScoreboardConstants.OBJECTIVE_NAME, Criteria.DUMMY, ComponentUtil.parseMessage(title));
             objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         } else {
             // 更新标题
-            objective.displayName(LegacyComponentUtil.toComponent(title));
+            objective.displayName(ComponentUtil.parseMessage(title));
         }
 
         // 清理超出新行数的旧 entry
@@ -134,7 +133,7 @@ public class PlayerScoreboardManager {
             String line = lines.get(i);
             String entry = String.valueOf(i);
             Score lineScore = objective.getScore(entry);
-            lineScore.customName(LegacyComponentUtil.toComponent(line));
+            lineScore.customName(ComponentUtil.parseMessage(line));
             // score 用固定值：20-i，这样无论 lines 多少行，同一个 entry 的 score 始终不变
             lineScore.setScore(20 - i);
             if (!showSerialNo) {
@@ -151,7 +150,11 @@ public class PlayerScoreboardManager {
         // 创建新目标(标题在1.13-最大32字符)
         Objective objective = scoreboard.registerNewObjective(ScoreboardConstants.OBJECTIVE_NAME, "dummy");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        objective.setDisplayName(BaseUtil.replaceChatColor(title));
+        if (!BaseUtil.supportsComponentApi()) {
+            objective.setDisplayName(BaseUtil.replaceChatColor(title));
+        } else {
+            objective.displayName(ComponentUtil.parseMessage(title));
+        }
         // 设置内容行
         int score = lines.size();
         for (String line : lines) {
@@ -160,20 +163,6 @@ public class PlayerScoreboardManager {
             lineScore.setScore(score);
             score--;
         }
-    }
-
-    /**
-     * 截断标题到版本允许的最大长度
-     * 1.13- 最大32字符
-     *
-     * @param title 标题
-     * @return 截断后的标题
-     */
-    private static String truncateTitle(String title) {
-        if (BaseConstants.VERSION_ID < VersionCheckEnum.V_1_13.getVersionId() && title.length() > 32) {
-            return title.substring(0, 32);
-        }
-        return title;
     }
 
     /**
@@ -214,20 +203,6 @@ public class PlayerScoreboardManager {
      */
     protected static Scoreboard getScoreboard(UUID playerUuid) {
         return PLAYER_SCOREBOARDS.get(playerUuid);
-    }
-
-    /**
-     * 判断是否支持 Component API (Paper 1.16.5+)
-     */
-    protected static boolean isPaperComponent() {
-        return (HandySchedulerUtil.isFolia() || HandySchedulerUtil.isPaper()) && BaseConstants.VERSION_ID >= VersionCheckEnum.V_1_16.getVersionId();
-    }
-
-    /**
-     * 判断是否支持 Score.customName API (Paper 1.20.4+)
-     */
-    private static boolean isPaperScoreCustomName() {
-        return isPaperComponent() && BaseConstants.VERSION_ID >= VersionCheckEnum.V_1_20_4.getVersionId();
     }
 
     /**
