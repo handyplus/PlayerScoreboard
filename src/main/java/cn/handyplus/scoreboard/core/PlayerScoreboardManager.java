@@ -93,7 +93,8 @@ public class PlayerScoreboardManager {
         // 标题和内容行的变量解析(使用合并后的内容,包含外部插件扩展)
         String title = PlaceholderApiUtil.set(player, scoreboardConfig.getMergedTitle(player.getUniqueId()));
         List<String> lines = PlaceholderApiUtil.set(player, scoreboardConfig.getMergedLines(player.getUniqueId()));
-
+        title = BaseUtil.headComponent(title, player.getName());
+        lines.replaceAll(line -> BaseUtil.headComponent(line, player.getName()));
         // 根据版本选择不同的实现
         if (BaseUtil.isHigherVersion()) {
             // Paper 1.20.4+ 支持 Score.customName 和 Component Objective（无闪烁更新）
