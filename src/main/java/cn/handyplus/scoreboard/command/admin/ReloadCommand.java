@@ -35,7 +35,7 @@ public class ReloadCommand implements IHandyCommandEvent {
         ConfigUtil.init();
         // 重新加载定时任务
         ScoreboardRefreshJob.start();
-        MessageUtil.sendMessage(sender, BaseUtil.getMsgNotColor("reloadMsg"));
+        MessageUtil.sendMessage(sender, BaseUtil.getLangMsg("reloadMsg"));
     }
 
 }

@@ -4,6 +4,7 @@ import cn.handyplus.lib.constants.BaseConstants;
 import cn.handyplus.lib.constants.VersionCheckEnum;
 import cn.handyplus.lib.util.BaseUtil;
 import cn.handyplus.lib.util.ComponentUtil;
+import cn.handyplus.lib.util.LegacyUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
@@ -145,11 +146,11 @@ public class PlayerTeamManager {
     @SuppressWarnings("deprecation")
     private static void setTeamPrefixAndSuffix(Team team, String prefix, String suffix) {
         if (BaseUtil.supportsComponentApi()) {
-            team.prefix(ComponentUtil.parseMessage(prefix));
-            team.suffix(ComponentUtil.parseMessage(suffix));
+            team.prefix(ComponentUtil.parseColor(prefix));
+            team.suffix(ComponentUtil.parseColor(suffix));
         } else {
-            team.setPrefix(BaseUtil.replaceChatColor(truncateTeamText(prefix)));
-            team.setSuffix(BaseUtil.replaceChatColor(truncateTeamText(suffix)));
+            team.setPrefix(LegacyUtil.parseColor(truncateTeamText(prefix)));
+            team.setSuffix(LegacyUtil.parseColor(truncateTeamText(suffix)));
         }
     }
 

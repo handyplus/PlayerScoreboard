@@ -4,6 +4,7 @@ import cn.handyplus.lib.constants.BaseConstants;
 import cn.handyplus.lib.constants.VersionCheckEnum;
 import cn.handyplus.lib.util.BaseUtil;
 import cn.handyplus.lib.util.ComponentUtil;
+import cn.handyplus.lib.util.LegacyUtil;
 import cn.handyplus.scoreboard.constants.ScoreboardConstants;
 import cn.handyplus.scoreboard.hook.PlaceholderApiUtil;
 import cn.handyplus.scoreboard.param.ScoreboardConfig;
@@ -116,11 +117,11 @@ public class PlayerScoreboardManager {
         // 获取或创建 Objective（不删除重建，避免闪烁）
         Objective objective = scoreboard.getObjective(ScoreboardConstants.OBJECTIVE_NAME);
         if (objective == null) {
-            objective = scoreboard.registerNewObjective(ScoreboardConstants.OBJECTIVE_NAME, Criteria.DUMMY, ComponentUtil.parseMessage(title));
+            objective = scoreboard.registerNewObjective(ScoreboardConstants.OBJECTIVE_NAME, Criteria.DUMMY, ComponentUtil.parseColor(title));
             objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         } else {
             // 更新标题
-            objective.displayName(ComponentUtil.parseMessage(title));
+            objective.displayName(ComponentUtil.parseColor(title));
         }
 
         // 清理超出新行数的旧 entry
@@ -134,7 +135,7 @@ public class PlayerScoreboardManager {
             String line = lines.get(i);
             String entry = String.valueOf(i);
             Score lineScore = objective.getScore(entry);
-            lineScore.customName(ComponentUtil.parseMessage(line));
+            lineScore.customName(ComponentUtil.parseColor(line));
             // score 用固定值：20-i，这样无论 lines 多少行，同一个 entry 的 score 始终不变
             lineScore.setScore(20 - i);
             if (!showSerialNo) {
@@ -152,15 +153,15 @@ public class PlayerScoreboardManager {
         Objective objective = scoreboard.registerNewObjective(ScoreboardConstants.OBJECTIVE_NAME, "dummy");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         if (!BaseUtil.supportsComponentApi()) {
-            objective.setDisplayName(BaseUtil.replaceChatColor(title));
+            objective.setDisplayName(LegacyUtil.parseColor(title));
         } else {
-            objective.displayName(ComponentUtil.parseMessage(title));
+            objective.displayName(ComponentUtil.parseColor(title));
         }
         // 设置内容行
         int score = lines.size();
         for (String line : lines) {
             // 内容行在1.13- 最大 30 字符
-            Score lineScore = objective.getScore(BaseUtil.replaceChatColor(truncateLine(line)));
+            Score lineScore = objective.getScore(LegacyUtil.parseColor(truncateLine(line)));
             lineScore.setScore(score);
             score--;
         }
