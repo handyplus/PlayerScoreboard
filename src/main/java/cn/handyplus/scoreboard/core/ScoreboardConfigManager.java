@@ -8,8 +8,10 @@ import cn.handyplus.scoreboard.param.ScoreboardConfig;
 import cn.handyplus.scoreboard.util.ConfigUtil;
 import org.bukkit.entity.Player;
 
+import java.util.AbstractMap;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -46,24 +48,34 @@ public class ScoreboardConfigManager {
      * @return 计分板配置
      */
     public static Optional<ScoreboardConfig> getPlayerScoreboardConfig(Player player) {
+        // 提前获取玩家信息，避免重复调用
+        String worldName = player.getWorld().getName();
+
         // 按优先级从高到低排序遍历(使用合并后的优先级,取外部插件设置的最大值)
         Optional<ScoreboardConfig> first = ScoreboardConstants.SCOREBOARD_CONFIGS.values().stream()
-                // 过滤出优先级大于等于 0 的配置
-                .filter(config -> config.getMergedPriority(player.getUniqueId()) >= 0)
-                // 按优先级降序排序
-                .sorted(Comparator.comparingInt((ScoreboardConfig config) -> config.getMergedPriority(player.getUniqueId())).reversed())
                 .filter(config -> {
-                    // 检查世界限制
+                    // 先做轻量级检查：世界限制
                     List<String> worlds = config.getWorlds();
                     if (CollUtil.isNotEmpty(worlds)) {
                         // 如果配置了 [ALL] 则表示所有世界都允许
-                        if (!CollUtil.contains(worlds, ScoreboardConstants.ALL) && !CollUtil.contains(worlds, player.getWorld().getName())) {
+                        if (!CollUtil.contains(worlds, ScoreboardConstants.ALL) && !CollUtil.contains(worlds, worldName)) {
                             return false;
                         }
                     }
                     // 检查玩家是否有对应权限
                     return player.hasPermission(config.getPermission());
                 })
+                // 过滤后再计算优先级并排序，减少计算次数
+                .map(config -> {
+                    // 缓存优先级，避免重复计算
+                    int priority = config.getMergedPriority(player.getUniqueId());
+                    return new AbstractMap.SimpleEntry<>(config, priority);
+                })
+                // 过滤出优先级大于等于 0 的配置
+                .filter(entry -> entry.getValue() >= 0)
+                // 按优先级降序排序
+                .sorted(Comparator.comparingInt((Map.Entry<ScoreboardConfig, Integer> entry) -> entry.getValue()).reversed())
+                .map(Map.Entry::getKey)
                 .findFirst();
         MessageUtil.sendConsoleDebugMessage("getPlayerScoreboardConfig: 玩家=" + player.getName() + ", 计分板=" + first.map(ScoreboardConfig::getKey).orElse("无"));
         return first;
