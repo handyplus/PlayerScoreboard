@@ -111,40 +111,4 @@
         </plugins>
     </build>
 
-    <profiles>
-        <profile>
-            <id>upload</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>wagon-maven-plugin</artifactId>
-                        <version>2.0.2</version>
-                        <executions>
-                            <execution>
-                                <id>upload-jar</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>upload-single</goal>
-                                </goals>
-                                <configuration>
-                                    <fromFile>${project.build.directory}/${project.artifactId}-${project.version}.jar</fromFile>
-                                    <url>${alist.dav.url}/${project.artifactId}</url>
-                                    <serverId>alist-dav</serverId>
-                                </configuration>
-                            </execution>
-                        </executions>
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.apache.maven.wagon</groupId>
-                                <artifactId>wagon-webdav-jackrabbit</artifactId>
-                                <version>3.5.3</version>
-                            </dependency>
-                        </dependencies>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
 </project>
