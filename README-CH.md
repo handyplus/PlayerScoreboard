@@ -6,7 +6,7 @@
 
 -------------------------------------------------------------------------------
 ![适用核心](https://img.shields.io/badge/适用核心-PAPER-blue)
-![适用版本](https://img.shields.io/badge/适用版本-1.8.x--1.21.x-blue)
+![适用版本](https://img.shields.io/badge/适用版本-1.8.x--26.1.x-blue)
 ![是否付费](https://img.shields.io/badge/是否付费-否-blue)
 ![最新版本](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fricedoc.handyplus.cn%2Fversion.json&query=%24.PlayerScoreboard&prefix=v&label=%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC)
 

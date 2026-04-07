@@ -6,7 +6,7 @@
 
 -------------------------------------------------------------------------------
 ![Compatible Core](https://img.shields.io/badge/Compatible%20Core-PAPER-blue)
-![Compatible Version](https://img.shields.io/badge/Compatible%20Version-1.8.x--1.21.x-blue)
+![Compatible Version](https://img.shields.io/badge/Compatible%20Version-1.8.x--26.1.x-blue)
 ![Paid](https://img.shields.io/badge/Paid-No-blue)
 ![Latest Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fricedoc.handyplus.cn%2Fversion.json&query=%24.PlayerScoreboard&prefix=v&label=Latest%20Version)
 
