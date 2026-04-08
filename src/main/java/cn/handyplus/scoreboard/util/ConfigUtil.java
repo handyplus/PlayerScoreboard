@@ -17,6 +17,7 @@ import java.util.Set;
 public class ConfigUtil {
 
     public static FileConfiguration SCOREBOARD_CONFIG;
+    public static FileConfiguration TAB_LIST_CONFIG;
 
     /**
      * 初始化加载文件
@@ -26,6 +27,7 @@ public class ConfigUtil {
         HandyConfigUtil.loadConfig();
         HandyConfigUtil.loadLangConfig(false);
         SCOREBOARD_CONFIG = HandyConfigUtil.load("scoreboard.yml");
+        TAB_LIST_CONFIG = HandyConfigUtil.load("tablist.yml");
         // 加载计分板配置
         ScoreboardConfigManager.loadConfigs();
         Set<String> commandAliasKey = HandyConfigUtil.getKey(BaseConstants.CONFIG, "commandAlias");

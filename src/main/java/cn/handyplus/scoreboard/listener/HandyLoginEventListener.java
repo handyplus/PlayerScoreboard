@@ -4,6 +4,7 @@ import cn.handyplus.lib.annotation.HandyListener;
 import cn.handyplus.lib.internal.HandyLoginEvent;
 import cn.handyplus.lib.util.HandyHttpUtil;
 import cn.handyplus.scoreboard.core.PlayerScoreboardManager;
+import cn.handyplus.scoreboard.core.TabListManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -25,6 +26,8 @@ public class HandyLoginEventListener implements Listener {
     public void onEvent(HandyLoginEvent event) {
         // 为玩家创建计分板
         PlayerScoreboardManager.createScoreboard(event.getPlayer());
+        // 立即刷新 TabList
+        TabListManager.updateTabList(event.getPlayer());
         // 立即刷新
         PlayerScoreboardManager.updateScoreboard(event.getPlayer());
         // 检查版本更新

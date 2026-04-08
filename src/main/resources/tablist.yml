@@ -1,0 +1,13 @@
+# TabList 配置
+tabList:
+  # 是否启用 TabList 表头表尾
+  enabled: false
+  # 表头内容,支持 PlaceholderAPI 变量
+  header:
+    - "&6&lPlayerScoreboard"
+    - "&7玩家: &f%player_name%"
+    - "&7在线: &f%server_online%"
+  # 表尾内容,支持 PlaceholderAPI 变量
+  footer:
+    - "&7世界: &f%player_world%"
+    - "&7时间: &f%server_time_HH:mm:ss%"

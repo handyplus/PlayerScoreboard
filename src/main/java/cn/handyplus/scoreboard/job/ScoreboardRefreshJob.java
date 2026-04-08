@@ -4,6 +4,7 @@ import cn.handyplus.lib.internal.HandyRunnable;
 import cn.handyplus.lib.internal.HandySchedulerUtil;
 import cn.handyplus.scoreboard.PlayerScoreboard;
 import cn.handyplus.scoreboard.core.PlayerScoreboardManager;
+import cn.handyplus.scoreboard.core.TabListManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -36,8 +37,11 @@ public class ScoreboardRefreshJob {
             public void run() {
                 // 遍历所有在线玩家,更新计分板
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    // 在主线程更新计分板
-                    HandySchedulerUtil.runTask(() -> PlayerScoreboardManager.updateScoreboard(player));
+                    // 在主线程同时刷新侧边栏和 TabList
+                    HandySchedulerUtil.runTask(() -> {
+                        TabListManager.updateTabList(player);
+                        PlayerScoreboardManager.updateScoreboard(player);
+                    });
                 }
             }
         };
