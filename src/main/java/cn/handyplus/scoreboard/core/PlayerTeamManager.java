@@ -2,6 +2,7 @@ package cn.handyplus.scoreboard.core;
 
 import cn.handyplus.lib.constants.BaseConstants;
 import cn.handyplus.lib.constants.VersionCheckEnum;
+import cn.handyplus.lib.internal.HandySchedulerUtil;
 import cn.handyplus.lib.util.BaseUtil;
 import cn.handyplus.lib.util.ComponentUtil;
 import cn.handyplus.lib.util.LegacyUtil;
@@ -60,6 +61,11 @@ public class PlayerTeamManager {
      * @param player 玩家
      */
     public static void refreshTabTeam(@NotNull Player player) {
+        if (!Bukkit.isPrimaryThread()) {
+            // Team 的 prefix/suffix 和注册/移除都必须在主线程执行，避免异步 API 调用触发计分板并发异常
+            HandySchedulerUtil.runTask(() -> refreshTabTeam(player));
+            return;
+        }
         if (!hasTabDisplay(player)) {
             // 未开启头像且没有 API 内容时不注册 Team；只清理曾经注册过的玩家，避免刷新时额外遍历
             if (TAB_TEAM_PLAYER_SET.remove(player.getUniqueId())) {
@@ -89,6 +95,10 @@ public class PlayerTeamManager {
     public static void removeTabTeam(@NotNull Player player) {
         TAB_PREFIX_MAP.remove(player.getUniqueId());
         TAB_SUFFIX_MAP.remove(player.getUniqueId());
+        if (!Bukkit.isPrimaryThread()) {
+            HandySchedulerUtil.runTask(() -> removeTabTeam(player));
+            return;
+        }
         // 只有真实注册过 Team 的玩家才需要从所有计分板移除
         if (TAB_TEAM_PLAYER_SET.remove(player.getUniqueId())) {
             unregisterTabTeam(player);
