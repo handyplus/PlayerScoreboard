@@ -10,8 +10,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <HandyLib.version>3.37.1</HandyLib.version>
-        <placeholderapi.version>2.11.7</placeholderapi.version>
+        <HandyLib.version>3.38.6</HandyLib.version>
     </properties>
 
     <dependencies>
@@ -24,10 +23,21 @@
         <dependency>
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
-            <version>${placeholderapi.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>cn.handyplus.lib</groupId>
+                <artifactId>HandyBom</artifactId>
+                <version>1.0.1</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>
