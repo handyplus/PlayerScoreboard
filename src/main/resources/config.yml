@@ -4,6 +4,10 @@ scoreboardRefreshInterval: 3
 # 是否在计分板显示序号 paper 1.20.3+支持
 showSerialNo: false
 
+# 是否在Tab列表玩家前缀最前面显示玩家头像
+# 1.21.9+支持
+showTabHead: false
+
 # 是否开启更新提醒,建议开启
 isCheckUpdate: true
 

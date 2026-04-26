@@ -78,6 +78,7 @@ public class PlayerScoreboardManager {
             // 更新计分板内容
             updateScoreboardContent(player, configOpt.get());
         }
+        PlayerTeamManager.refreshTabTeam(player);
     }
 
     /**
