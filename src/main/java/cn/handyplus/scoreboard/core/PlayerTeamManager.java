@@ -144,7 +144,9 @@ public class PlayerTeamManager {
     private static String getMergedPrefix(Player player) {
         String prefix = TAB_PREFIX_MAP.getOrDefault(player.getUniqueId(), "");
         if (BaseConstants.CONFIG.getBoolean("showTabHead")) {
-            return BaseUtil.headComponent("${head}", player.getName()) + prefix;
+            String head = BaseUtil.headComponent("${head}", player.getName());
+            String format = BaseConstants.CONFIG.getString("showTabHeadFormat", "${prefix}${head}");
+            return format.replace("${head}", head).replace("${prefix}", prefix);
         }
         return prefix;
     }

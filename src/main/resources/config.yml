@@ -8,6 +8,9 @@ showSerialNo: false
 # 1.21.9+支持
 showTabHead: false
 
+# Tab列表玩家头像和前缀显示格式,支持变量: ${head} ${prefix}
+showTabHeadFormat: "${prefix}${head}"
+
 # 是否开启更新提醒,建议开启
 isCheckUpdate: true
 

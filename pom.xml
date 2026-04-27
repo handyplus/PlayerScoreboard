@@ -10,7 +10,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <HandyLib.version>3.38.6</HandyLib.version>
+        <HandyLib.version>3.38.7</HandyLib.version>
     </properties>
 
     <dependencies>
