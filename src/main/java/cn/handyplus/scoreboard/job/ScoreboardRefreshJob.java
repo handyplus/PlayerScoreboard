@@ -37,17 +37,14 @@ public class ScoreboardRefreshJob {
             public void run() {
                 // 遍历所有在线玩家,更新计分板
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    // 在主线程同时刷新侧边栏和 TabList
-                    HandySchedulerUtil.runTask(() -> {
-                        TabListManager.updateTabList(player);
-                        PlayerScoreboardManager.updateScoreboard(player);
-                    });
+                    TabListManager.updateTabList(player);
+                    PlayerScoreboardManager.updateScoreboard(player);
                 }
             }
         };
         // 获取刷新间隔(秒)
         int interval = PlayerScoreboard.INSTANCE.getConfig().getInt("scoreboardRefreshInterval", 10);
-        HandySchedulerUtil.runTaskTimerAsynchronously(REFRESH_TASK, 20L, interval * 20L);
+        HandySchedulerUtil.runTaskTimer(REFRESH_TASK, 20L, interval * 20L);
     }
 
 }

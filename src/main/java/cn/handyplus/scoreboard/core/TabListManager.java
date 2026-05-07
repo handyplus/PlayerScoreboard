@@ -1,10 +1,12 @@
 package cn.handyplus.scoreboard.core;
 
 import cn.handyplus.lib.core.CollUtil;
+import cn.handyplus.lib.internal.HandySchedulerUtil;
 import cn.handyplus.lib.util.BaseUtil;
 import cn.handyplus.lib.util.ComponentUtil;
 import cn.handyplus.scoreboard.hook.PlaceholderApiUtil;
 import cn.handyplus.scoreboard.util.ConfigUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -25,6 +27,10 @@ public class TabListManager {
      * @param player 玩家
      */
     public static void updateTabList(Player player) {
+        if (!Bukkit.isPrimaryThread()) {
+            HandySchedulerUtil.runTask(() -> updateTabList(player));
+            return;
+        }
         if (!ConfigUtil.TAB_LIST_CONFIG.getBoolean("tabList.enabled", false)) {
             clearTabList(player);
             return;
@@ -40,6 +46,10 @@ public class TabListManager {
      * @param player 玩家
      */
     public static void clearTabList(Player player) {
+        if (!Bukkit.isPrimaryThread()) {
+            HandySchedulerUtil.runTask(() -> clearTabList(player));
+            return;
+        }
         applyHeaderFooter(player, "", "");
     }
 

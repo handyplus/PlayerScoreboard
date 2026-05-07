@@ -27,11 +27,6 @@ public class ToggleCommand implements IHandyCommandEvent {
     }
 
     @Override
-    public boolean isAsync() {
-        return true;
-    }
-
-    @Override
     public void onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         Player player = AssertUtil.notPlayer(sender, BaseUtil.getLangMsg("noPlayerFailureMsg"));
         boolean enabled = PlayerScoreboardManager.toggleScoreboard(player);

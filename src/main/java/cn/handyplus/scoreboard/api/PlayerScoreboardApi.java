@@ -1,6 +1,5 @@
 package cn.handyplus.scoreboard.api;
 
-import cn.handyplus.lib.core.MapUtil;
 import cn.handyplus.scoreboard.constants.ScoreboardConstants;
 import cn.handyplus.scoreboard.core.PlayerScoreboardManager;
 import cn.handyplus.scoreboard.core.PlayerTeamManager;
@@ -13,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 计分板API
@@ -178,8 +178,8 @@ public class PlayerScoreboardApi {
      * @return 计分板配置
      */
     private static ScoreboardConfig getOrCreateConfig(Plugin plugin, UUID playerUuid, String scoreboardKey) {
-        Map<UUID, Map<String, ScoreboardConfig>> pluginConfigs = ScoreboardConstants.SCOREBOARD_EXTERNAL.computeIfAbsent(plugin, k -> MapUtil.of());
-        Map<String, ScoreboardConfig> playerConfigs = pluginConfigs.computeIfAbsent(playerUuid, k -> MapUtil.of());
+        Map<UUID, Map<String, ScoreboardConfig>> pluginConfigs = ScoreboardConstants.SCOREBOARD_EXTERNAL.computeIfAbsent(plugin, k -> new ConcurrentHashMap<>());
+        Map<String, ScoreboardConfig> playerConfigs = pluginConfigs.computeIfAbsent(playerUuid, k -> new ConcurrentHashMap<>());
         ScoreboardConfig config = playerConfigs.get(scoreboardKey);
         if (config == null) {
             config = ScoreboardConfig.of(scoreboardKey, new ArrayList<>());

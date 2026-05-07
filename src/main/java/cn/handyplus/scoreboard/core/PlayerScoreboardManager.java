@@ -2,6 +2,7 @@ package cn.handyplus.scoreboard.core;
 
 import cn.handyplus.lib.constants.BaseConstants;
 import cn.handyplus.lib.constants.VersionCheckEnum;
+import cn.handyplus.lib.internal.HandySchedulerUtil;
 import cn.handyplus.lib.util.BaseUtil;
 import cn.handyplus.lib.util.ComponentUtil;
 import cn.handyplus.lib.util.LegacyUtil;
@@ -49,6 +50,10 @@ public class PlayerScoreboardManager {
      * @param player 玩家
      */
     public static void createScoreboard(Player player) {
+        if (!Bukkit.isPrimaryThread()) {
+            HandySchedulerUtil.runTask(() -> createScoreboard(player));
+            return;
+        }
         UUID uuid = player.getUniqueId();
         Scoreboard scoreboard = PLAYER_SCOREBOARDS.computeIfAbsent(uuid, k -> Bukkit.getScoreboardManager().getNewScoreboard());
         PLAYER_SCOREBOARD_ENABLED.putIfAbsent(uuid, true);
@@ -61,6 +66,10 @@ public class PlayerScoreboardManager {
      * @param player 玩家
      */
     public static void updateScoreboard(Player player) {
+        if (!Bukkit.isPrimaryThread()) {
+            HandySchedulerUtil.runTask(() -> updateScoreboard(player));
+            return;
+        }
         UUID uuid = player.getUniqueId();
         // 获取或创建计分板
         Scoreboard scoreboard = PLAYER_SCOREBOARDS.get(uuid);
@@ -79,6 +88,44 @@ public class PlayerScoreboardManager {
             updateScoreboardContent(player, configOpt.get());
         }
         PlayerTeamManager.refreshTabTeam(player);
+    }
+
+    /**
+     * 移除玩家计分板
+     *
+     * @param player 玩家
+     */
+    public static void removeScoreboard(Player player) {
+        if (!Bukkit.isPrimaryThread()) {
+            HandySchedulerUtil.runTask(() -> removeScoreboard(player));
+            return;
+        }
+        PLAYER_SCOREBOARDS.remove(player.getUniqueId());
+        PLAYER_SCOREBOARD_ENABLED.remove(player.getUniqueId());
+    }
+
+    /**
+     * 切换玩家计分板显示状态
+     *
+     * @param player 玩家
+     * @return 切换后的状态
+     */
+    public static boolean toggleScoreboard(Player player) {
+        UUID playerUuid = player.getUniqueId();
+        if (!Bukkit.isPrimaryThread()) {
+            HandySchedulerUtil.runTask(() -> toggleScoreboard(player));
+            return PLAYER_SCOREBOARD_ENABLED.getOrDefault(playerUuid, true);
+        }
+        boolean enabled = !PLAYER_SCOREBOARD_ENABLED.getOrDefault(playerUuid, true);
+        PLAYER_SCOREBOARD_ENABLED.put(playerUuid, enabled);
+        if (!enabled) {
+            // 隐藏计分板
+            hideScoreboard(playerUuid);
+        } else {
+            // 显示计分板
+            updateScoreboard(player);
+        }
+        return enabled;
     }
 
     /**
@@ -166,36 +213,6 @@ public class PlayerScoreboardManager {
             lineScore.setScore(score);
             score--;
         }
-    }
-
-    /**
-     * 移除玩家计分板
-     *
-     * @param player 玩家
-     */
-    public static void removeScoreboard(Player player) {
-        PLAYER_SCOREBOARDS.remove(player.getUniqueId());
-        PLAYER_SCOREBOARD_ENABLED.remove(player.getUniqueId());
-    }
-
-    /**
-     * 切换玩家计分板显示状态
-     *
-     * @param player 玩家
-     * @return 切换后的状态
-     */
-    public static boolean toggleScoreboard(Player player) {
-        UUID playerUuid = player.getUniqueId();
-        boolean enabled = !PLAYER_SCOREBOARD_ENABLED.getOrDefault(playerUuid, true);
-        PLAYER_SCOREBOARD_ENABLED.put(playerUuid, enabled);
-        if (!enabled) {
-            // 隐藏计分板
-            hideScoreboard(playerUuid);
-        } else {
-            // 显示计分板
-            updateScoreboard(player);
-        }
-        return enabled;
     }
 
     /**

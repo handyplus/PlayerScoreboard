@@ -7,9 +7,9 @@ import cn.handyplus.scoreboard.core.TabListManager;
 import cn.handyplus.scoreboard.job.ScoreboardRefreshJob;
 import cn.handyplus.scoreboard.util.ConfigUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 /**
  * 重载配置
@@ -26,11 +26,6 @@ public class ReloadCommand implements IHandyCommandEvent {
     @Override
     public String permission() {
         return "playerScoreboard.reload";
-    }
-
-    @Override
-    public boolean isAsync() {
-        return true;
     }
 
     @Override

@@ -6,6 +6,7 @@ import org.bukkit.plugin.Plugin;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 常量
@@ -26,7 +27,7 @@ public final class ScoreboardConstants {
      * key: 插件实例
      * value: 玩家 UUID -> 该插件注册的计分板配置(key为计分板配置key)
      */
-    public static Map<Plugin, Map<UUID, Map<String, ScoreboardConfig>>> SCOREBOARD_EXTERNAL = new HashMap<>();
+    public static Map<Plugin, Map<UUID, Map<String, ScoreboardConfig>>> SCOREBOARD_EXTERNAL = new ConcurrentHashMap<>();
 
     /**
      * 所有世界标识
