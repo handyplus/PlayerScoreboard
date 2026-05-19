@@ -1,9 +1,12 @@
 package cn.handyplus.scoreboard.core;
 
+import cn.handyplus.lib.constants.BaseConstants;
+import cn.handyplus.lib.constants.VersionCheckEnum;
 import cn.handyplus.lib.core.CollUtil;
 import cn.handyplus.lib.internal.HandySchedulerUtil;
 import cn.handyplus.lib.util.BaseUtil;
 import cn.handyplus.lib.util.ComponentUtil;
+import cn.handyplus.lib.util.LegacyUtil;
 import cn.handyplus.scoreboard.hook.PlaceholderApiUtil;
 import cn.handyplus.scoreboard.util.ConfigUtil;
 import org.bukkit.Bukkit;
@@ -27,30 +30,17 @@ public class TabListManager {
      * @param player 玩家
      */
     public static void updateTabList(Player player) {
-        if (!Bukkit.isPrimaryThread()) {
-            HandySchedulerUtil.runTask(() -> updateTabList(player));
+        boolean tabListEnable = ConfigUtil.TAB_LIST_CONFIG.getBoolean("tabList.enabled", false);
+        if (!tabListEnable) {
             return;
         }
-        if (!ConfigUtil.TAB_LIST_CONFIG.getBoolean("tabList.enabled", false)) {
-            clearTabList(player);
+        if (!Bukkit.isPrimaryThread()) {
+            HandySchedulerUtil.runTask(() -> updateTabList(player));
             return;
         }
         String header = buildContent(player, ConfigUtil.TAB_LIST_CONFIG.getStringList("tabList.header"));
         String footer = buildContent(player, ConfigUtil.TAB_LIST_CONFIG.getStringList("tabList.footer"));
         applyHeaderFooter(player, header, footer);
-    }
-
-    /**
-     * 清空玩家 TabList 的表头和表尾
-     *
-     * @param player 玩家
-     */
-    public static void clearTabList(Player player) {
-        if (!Bukkit.isPrimaryThread()) {
-            HandySchedulerUtil.runTask(() -> clearTabList(player));
-            return;
-        }
-        applyHeaderFooter(player, "", "");
     }
 
     /**
@@ -76,8 +66,15 @@ public class TabListManager {
      * @param header 表头
      * @param footer 表尾
      */
+    @SuppressWarnings("deprecation")
     private static void applyHeaderFooter(Player player, String header, String footer) {
-        player.sendPlayerListHeaderAndFooter(ComponentUtil.parseColor(header), ComponentUtil.parseColor(footer));
+        if (BaseUtil.supportsComponentApi()) {
+            player.sendPlayerListHeaderAndFooter(ComponentUtil.parseColor(header), ComponentUtil.parseColor(footer));
+            return;
+        }
+        if (BaseConstants.VERSION_ID >= VersionCheckEnum.V_1_13.getVersionId()) {
+            player.setPlayerListHeaderFooter(LegacyUtil.parseColor(header), LegacyUtil.parseColor(footer));
+        }
     }
 
 }

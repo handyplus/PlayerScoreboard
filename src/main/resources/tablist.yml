@@ -1,4 +1,4 @@
-# TabList 配置
+# TabList 配置 1.13+支持
 tabList:
   # 是否启用 TabList 表头表尾
   enabled: false
